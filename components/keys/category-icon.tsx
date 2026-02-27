@@ -1,16 +1,38 @@
 import { cn } from '@/lib/utils'
 import type { KeyCategory } from '@/types'
+import type { SimpleIcon } from 'simple-icons'
+import * as si from 'simple-icons'
 
 interface CategoryIconProps {
-  category: Pick<KeyCategory, 'iconEmoji' | 'iconUrl' | 'color' | 'name'>
+  category: Pick<KeyCategory, 'iconSlug' | 'iconUrl' | 'color' | 'name'>
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
 
 const sizeClasses = {
-  sm: 'size-7 text-sm',
-  md: 'size-10 text-base',
-  lg: 'size-14 text-2xl'
+  sm: 'size-7',
+  md: 'size-10',
+  lg: 'size-14'
+}
+
+const svgSizeClasses = {
+  sm: 'size-3.5',
+  md: 'size-5',
+  lg: 'size-7'
+}
+
+function getIcon(slug: string): SimpleIcon | undefined {
+  // simple-icons export names: "si" + PascalCase slug, e.g. "openai" → "siOpenai"
+  const varName = 'si' + slug.charAt(0).toUpperCase() + slug.slice(1)
+  return (si as unknown as Record<string, SimpleIcon | undefined>)[varName]
+}
+
+// Returns true if a 6-char hex color is too dark to be visible on a dark background
+function isHexDark(hex: string): boolean {
+  const r = parseInt(hex.slice(0, 2), 16)
+  const g = parseInt(hex.slice(2, 4), 16)
+  const b = parseInt(hex.slice(4, 6), 16)
+  return 0.299 * r + 0.587 * g + 0.114 * b < 80
 }
 
 export function CategoryIcon({
@@ -19,34 +41,47 @@ export function CategoryIcon({
   className
 }: CategoryIconProps) {
   const initials = category.name.slice(0, 2).toUpperCase()
+  const icon = category.iconSlug ? getIcon(category.iconSlug) : undefined
+  const brandColor = icon ? `#${icon.hex}` : null
+  const displayColor = category.color ?? brandColor ?? '#ffffff'
+
+  // On dark backgrounds, very dark icons become invisible — use white fill instead
+  const rawHex = (category.color ?? brandColor)?.slice(1)
+  const iconFill = rawHex && isHexDark(rawHex) ? '#ffffff' : displayColor
 
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-lg font-mono font-bold',
+        'flex shrink-0 items-center justify-center overflow-hidden rounded-lg',
         sizeClasses[size],
         className
       )}
       style={{
-        backgroundColor: category.color
-          ? `${category.color}22`
-          : 'oklch(0.65 0.2 150 / 0.15)',
-        border: `1px solid ${category.color ?? 'oklch(0.65 0.2 150 / 0.3)'}`
+        backgroundColor: `${displayColor}22`,
+        border: `1px solid ${displayColor}66`
       }}
     >
-      {category.iconEmoji ? (
-        <span>{category.iconEmoji}</span>
+      {icon ? (
+        <svg
+          role="img"
+          viewBox="0 0 24 24"
+          className={svgSizeClasses[size]}
+          style={{ fill: iconFill }}
+          aria-label={icon.title}
+        >
+          <path d={icon.path} />
+        </svg>
       ) : category.iconUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={category.iconUrl}
           alt={category.name}
-          className="size-full rounded object-contain p-0.5"
+          className="size-full rounded-lg object-cover"
         />
       ) : (
         <span
-          className="text-xs font-bold"
-          style={{ color: category.color ?? 'oklch(0.65 0.2 150)' }}
+          className="font-mono text-xs font-bold"
+          style={{ color: displayColor }}
         >
           {initials}
         </span>

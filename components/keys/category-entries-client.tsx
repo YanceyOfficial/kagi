@@ -128,7 +128,7 @@ export function CategoryEntriesClient({
           />
         </div>
         <Select value={envFilter} onValueChange={setEnvFilter}>
-          <SelectTrigger className="w-40 font-mono text-sm">
+          <SelectTrigger className="font-mono text-sm">
             <Filter className="mr-2 size-3.5" />
             <SelectValue />
           </SelectTrigger>

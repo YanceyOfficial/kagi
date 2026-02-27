@@ -100,51 +100,51 @@
 
 /* Dark mode: full matrix terminal — black background, green accents */
 .dark {
-  /* Backgrounds — near-black with very faint green tint */
-  --background: oklch(0.1 0.008 150);
-  --foreground: oklch(0.9 0.04 150);
+  /* Backgrounds — near-pure black with subtle green cast */
+  --background: oklch(0.08 0.01 145);
+  --foreground: oklch(0.92 0.1 145);
 
-  --card: oklch(0.13 0.01 150);
-  --card-foreground: oklch(0.9 0.04 150);
+  --card: oklch(0.11 0.014 145);
+  --card-foreground: oklch(0.92 0.1 145);
 
-  --popover: oklch(0.13 0.01 150);
-  --popover-foreground: oklch(0.9 0.04 150);
+  --popover: oklch(0.11 0.014 145);
+  --popover-foreground: oklch(0.92 0.1 145);
 
-  /* Bright matrix green */
-  --primary: oklch(0.65 0.2 150);
-  --primary-foreground: oklch(0.08 0.01 150);
+  /* Phosphor matrix green — brighter & more saturated */
+  --primary: oklch(0.78 0.27 142);
+  --primary-foreground: oklch(0.07 0.01 145);
 
-  --secondary: oklch(0.18 0.015 150);
-  --secondary-foreground: oklch(0.88 0.05 150);
+  --secondary: oklch(0.16 0.022 145);
+  --secondary-foreground: oklch(0.90 0.08 145);
 
-  --muted: oklch(0.18 0.012 150);
-  --muted-foreground: oklch(0.55 0.07 150);
+  --muted: oklch(0.16 0.016 145);
+  --muted-foreground: oklch(0.60 0.15 145);
 
-  --accent: oklch(0.2 0.025 150);
-  --accent-foreground: oklch(0.85 0.08 150);
+  --accent: oklch(0.19 0.032 145);
+  --accent-foreground: oklch(0.88 0.13 145);
 
   --destructive: oklch(0.65 0.22 25);
 
-  --border: oklch(0.25 0.02 150);
-  --input: oklch(0.2 0.015 150);
-  --ring: oklch(0.65 0.2 150);
+  --border: oklch(0.24 0.035 145);
+  --input: oklch(0.19 0.022 145);
+  --ring: oklch(0.78 0.27 142);
 
   /* Charts — greens + teal accents */
-  --chart-1: oklch(0.65 0.2 150);
-  --chart-2: oklch(0.55 0.18 165);
-  --chart-3: oklch(0.75 0.16 130);
-  --chart-4: oklch(0.5 0.15 170);
-  --chart-5: oklch(0.45 0.13 140);
+  --chart-1: oklch(0.78 0.27 142);
+  --chart-2: oklch(0.65 0.22 162);
+  --chart-3: oklch(0.88 0.2 128);
+  --chart-4: oklch(0.55 0.18 168);
+  --chart-5: oklch(0.50 0.16 138);
 
   /* Sidebar — slightly lighter than main background */
-  --sidebar: oklch(0.12 0.01 150);
-  --sidebar-foreground: oklch(0.88 0.05 150);
-  --sidebar-primary: oklch(0.65 0.2 150);
-  --sidebar-primary-foreground: oklch(0.08 0.01 150);
-  --sidebar-accent: oklch(0.18 0.02 150);
-  --sidebar-accent-foreground: oklch(0.85 0.06 150);
-  --sidebar-border: oklch(0.22 0.015 150);
-  --sidebar-ring: oklch(0.65 0.2 150);
+  --sidebar: oklch(0.10 0.012 145);
+  --sidebar-foreground: oklch(0.90 0.09 145);
+  --sidebar-primary: oklch(0.78 0.27 142);
+  --sidebar-primary-foreground: oklch(0.07 0.01 145);
+  --sidebar-accent: oklch(0.17 0.028 145);
+  --sidebar-accent-foreground: oklch(0.88 0.11 145);
+  --sidebar-border: oklch(0.21 0.025 145);
+  --sidebar-ring: oklch(0.78 0.27 142);
 }
 
 @layer base {
@@ -168,19 +168,17 @@
 
   /* Terminal-style scanline effect for key reveal areas */
   .terminal-bg {
-    background-color: oklch(0.08 0.01 150);
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      oklch(0.65 0.2 150 / 0.03) 2px,
-      oklch(0.65 0.2 150 / 0.03) 4px
-    );
+    background-color: oklch(0.07 0.01 145);
+    background-image: repeating-linear-gradient(0deg,
+        transparent,
+        transparent 2px,
+        oklch(0.78 0.27 142 / 0.04) 2px,
+        oklch(0.78 0.27 142 / 0.04) 4px);
   }
 
   /* Subtle green glow for important interactive elements */
   .glow-green {
-    box-shadow: 0 0 8px oklch(0.65 0.2 150 / 0.35);
+    box-shadow: 0 0 10px oklch(0.78 0.27 142 / 0.45);
   }
 
   /* Blinking cursor indicator */
@@ -191,10 +189,12 @@
   }
 
   @keyframes blink {
+
     0%,
     100% {
       opacity: 1;
     }
+
     50% {
       opacity: 0;
     }

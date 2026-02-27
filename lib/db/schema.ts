@@ -91,8 +91,8 @@ export const keyCategories = pgTable('key_categories', {
   description: text('description'),
   // Either a URL to an external logo image or null
   iconUrl: text('icon_url'),
-  // Emoji shorthand for quick identification, e.g. "🤖"
-  iconEmoji: varchar('icon_emoji', { length: 10 }),
+  // Simple Icons slug, e.g. "openai", "amazonaws", "github"
+  iconSlug: varchar('icon_slug', { length: 50 }),
   // Hex color for the category badge, e.g. "#22c55e"
   color: varchar('color', { length: 7 }),
   keyType: keyTypeEnum('key_type').notNull(),

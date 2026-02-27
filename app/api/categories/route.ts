@@ -9,7 +9,7 @@ const createSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().max(1000).optional(),
   iconUrl: z.string().url().optional().or(z.literal('')),
-  iconEmoji: z.string().max(10).optional(),
+  iconSlug: z.string().max(50).optional().nullable(),
   color: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         name: keyCategories.name,
         description: keyCategories.description,
         iconUrl: keyCategories.iconUrl,
-        iconEmoji: keyCategories.iconEmoji,
+        iconSlug: keyCategories.iconSlug,
         color: keyCategories.color,
         keyType: keyCategories.keyType,
         envVarName: keyCategories.envVarName,
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       name,
       description,
       iconUrl,
-      iconEmoji,
+      iconSlug,
       color,
       keyType,
       envVarName,
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         name,
         description: description ?? null,
         iconUrl: iconUrl || null,
-        iconEmoji: iconEmoji ?? null,
+        iconSlug: iconSlug ?? null,
         color: color ?? null,
         keyType,
         envVarName: envVarName ?? null,

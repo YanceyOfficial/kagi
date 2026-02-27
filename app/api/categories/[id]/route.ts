@@ -9,7 +9,7 @@ const updateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
   description: z.string().max(1000).optional().nullable(),
   iconUrl: z.string().url().optional().nullable().or(z.literal('')),
-  iconEmoji: z.string().max(10).optional().nullable(),
+  iconSlug: z.string().max(50).optional().nullable(),
   color: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)

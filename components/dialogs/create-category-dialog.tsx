@@ -1,5 +1,6 @@
 'use client'
 
+import { IconTypePicker } from '@/components/keys/simple-icon-picker'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -56,8 +57,7 @@ function ServiceNameCombobox({
 
   // Names to show in dropdown: filter by current input, excluding own name
   const suggestions = existingNames.filter(
-    (n) =>
-      n !== excludeName && n.toLowerCase().includes(trimmed.toLowerCase())
+    (n) => n !== excludeName && n.toLowerCase().includes(trimmed.toLowerCase())
   )
 
   // True when the typed value exactly matches an existing name (conflict)
@@ -117,7 +117,7 @@ function ServiceNameCombobox({
         <div className="bg-popover border-border absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-md border shadow-md">
           {suggestions.length > 0 && (
             <div className="border-border border-b px-2 py-1">
-              <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-wider">
+              <p className="text-muted-foreground font-mono text-[10px] tracking-wider uppercase">
                 Existing services
               </p>
             </div>
@@ -174,14 +174,29 @@ function ServiceNameCombobox({
   )
 }
 
+// ─── Google Favicon helpers ───────────────────────────────────────────────────
+
+function buildFaviconUrl(input: string): string {
+  const url = input.startsWith('http') ? input : `https://${input}`
+  return `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=128`
+}
+
+// When editing, extract the original domain from a stored Google favicon URL
+function extractDomain(stored: string): string {
+  try {
+    const target = new URL(stored).searchParams.get('url')
+    if (target) return new URL(target).hostname
+  } catch {}
+  return stored
+}
+
 // ─── Dialog ───────────────────────────────────────────────────────────────────
 
 type FormValues = {
   name: string
   description: string
-  iconEmoji: string
+  iconSlug: string
   iconUrl: string
-  color: string
   keyType: KeyType
   envVarName: string
   fieldDefinitions: string[]
@@ -219,9 +234,8 @@ export function CreateCategoryDialog({
     defaultValues: {
       name: editTarget?.name ?? '',
       description: editTarget?.description ?? '',
-      iconEmoji: editTarget?.iconEmoji ?? '',
-      iconUrl: editTarget?.iconUrl ?? '',
-      color: editTarget?.color ?? '',
+      iconSlug: editTarget?.iconSlug ?? '',
+      iconUrl: editTarget?.iconUrl ? extractDomain(editTarget.iconUrl) : '',
       keyType: (editTarget?.keyType ?? 'simple') as KeyType,
       envVarName: editTarget?.envVarName ?? '',
       fieldDefinitions: editTarget?.fieldDefinitions ?? ([] as string[])
@@ -230,9 +244,8 @@ export function CreateCategoryDialog({
       const cleaned: CreateKeyCategoryInput = {
         name: value.name,
         description: value.description || undefined,
-        iconEmoji: value.iconEmoji || undefined,
-        iconUrl: value.iconUrl || undefined,
-        color: value.color || undefined,
+        iconSlug: value.iconSlug || null,
+        iconUrl: value.iconUrl ? buildFaviconUrl(value.iconUrl) : undefined,
         keyType: value.keyType,
         envVarName:
           value.keyType === 'simple'
@@ -256,9 +269,25 @@ export function CreateCategoryDialog({
 
   const isPending = createMutation.isPending || updateMutation.isPending
 
+  // Reset form every time the dialog opens so stale state never leaks between sessions
+  useEffect(() => {
+    if (!open) return
+    form.reset({
+      name: editTarget?.name ?? '',
+      description: editTarget?.description ?? '',
+      iconSlug: editTarget?.iconSlug ?? '',
+      iconUrl: editTarget?.iconUrl ? extractDomain(editTarget.iconUrl) : '',
+      keyType: (editTarget?.keyType ?? 'simple') as KeyType,
+      envVarName: editTarget?.envVarName ?? '',
+      fieldDefinitions: editTarget?.fieldDefinitions ?? []
+    })
+    setNewField('')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl font-mono">
+      <DialogContent className="font-mono sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? 'Edit Category' : 'New Key Category'}
@@ -275,7 +304,7 @@ export function CreateCategoryDialog({
             e.preventDefault()
             form.handleSubmit()
           }}
-          className="max-h-[70vh] space-y-4 overflow-y-auto pt-2 pr-1"
+          className="max-h-[70vh] space-y-4 overflow-y-auto px-1 pt-2"
         >
           {/* Service Name — searchable combobox with uniqueness check */}
           <form.Field
@@ -287,9 +316,7 @@ export function CreateCategoryDialog({
 
                 const conflict = existingNames
                   .filter((n) => n !== editTarget?.name)
-                  .some(
-                    (n) => n.toLowerCase() === value.trim().toLowerCase()
-                  )
+                  .some((n) => n.toLowerCase() === value.trim().toLowerCase())
                 if (conflict)
                   return `"${value.trim()}" already exists as a category`
                 return undefined
@@ -447,56 +474,34 @@ export function CreateCategoryDialog({
             )}
           </form.Field>
 
-          {/* Icon / Color row */}
-          <div className="grid grid-cols-2 gap-4">
-            <form.Field name="iconEmoji">
-              {(field) => (
-                <div className="space-y-1">
-                  <Label className="text-xs">Emoji Icon</Label>
-                  <Input
-                    placeholder="🤖"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="font-mono text-sm"
-                    maxLength={2}
-                  />
-                </div>
-              )}
-            </form.Field>
-            <form.Field name="color">
-              {(field) => (
-                <div className="space-y-1">
-                  <Label className="text-xs">Color</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="color"
-                      value={field.state.value || '#22c55e'}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="h-9 w-10 cursor-pointer p-1"
-                    />
-                    <Input
-                      placeholder="#22c55e"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className="flex-1 font-mono text-sm"
-                    />
-                  </div>
-                </div>
-              )}
-            </form.Field>
-          </div>
+          {/* Brand Icon */}
+          <form.Field name="iconSlug">
+            {(field) => (
+              <div className="space-y-1">
+                <Label className="text-xs">Brand Icon</Label>
+                <IconTypePicker
+                  value={field.state.value}
+                  onChange={(slug) => field.handleChange(slug)}
+                />
+              </div>
+            )}
+          </form.Field>
 
-          {/* Logo URL */}
+          {/* Logo domain → auto favicon */}
           <form.Field name="iconUrl">
             {(field) => (
               <div className="space-y-1">
-                <Label className="text-xs">Logo URL (optional)</Label>
+                <Label className="text-xs">Service Website (optional)</Label>
                 <Input
-                  placeholder="https://example.com/logo.png"
+                  placeholder="e.g. openai.com"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   className="font-mono text-sm"
                 />
+                <p className="text-muted-foreground text-xs">
+                  Enter a domain and we&apos;ll fetch the logo via Google&apos;s
+                  favicon service. Useful when Brand Icon has no match.
+                </p>
               </div>
             )}
           </form.Field>

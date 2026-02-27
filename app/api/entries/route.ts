@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
           keyType: keyCategories.keyType,
           envVarName: keyCategories.envVarName,
           fieldDefinitions: keyCategories.fieldDefinitions,
-          iconEmoji: keyCategories.iconEmoji,
+          iconSlug: keyCategories.iconSlug,
           iconUrl: keyCategories.iconUrl,
           color: keyCategories.color
         }

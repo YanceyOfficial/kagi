@@ -2,7 +2,7 @@
 
 > A self-hosted private key management system with AI-powered extraction.
 
-Kagi (Japanese: 鍵, *key*) is a secure vault for all your private keys, API credentials, SSH keys, and 2FA recovery tokens. Keys are encrypted at rest with AES-256-GCM and accessed through a clean, geeky terminal-themed interface.
+Kagi (Japanese: 鍵, _key_) is a secure vault for all your private keys, API credentials, SSH keys, and 2FA recovery tokens. Keys are encrypted at rest with AES-256-GCM and accessed through a clean, geeky terminal-themed interface.
 
 ---
 
@@ -21,17 +21,17 @@ Kagi (Japanese: 鍵, *key*) is a secure vault for all your private keys, API cre
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, RSC) |
-| Database | PostgreSQL + Drizzle ORM |
-| Auth | better-auth + Keycloak (OIDC) |
-| UI | shadcn/ui + Tailwind CSS v4 |
-| Data fetching | TanStack React Query |
-| Forms | TanStack React Form + Zod |
-| AI | Vercel AI SDK + OpenAI (gpt-4o-mini) |
-| Editor | Monaco Editor |
-| Package manager | pnpm |
+| Layer           | Technology                           |
+| --------------- | ------------------------------------ |
+| Framework       | Next.js 16 (App Router, RSC)         |
+| Database        | PostgreSQL + Drizzle ORM             |
+| Auth            | better-auth + Keycloak (OIDC)        |
+| UI              | shadcn/ui + Tailwind CSS v4          |
+| Data fetching   | TanStack React Query                 |
+| Forms           | TanStack React Form + Zod            |
+| AI              | Vercel AI SDK + OpenAI (gpt-4o-mini) |
+| Editor          | Monaco Editor                        |
+| Package manager | pnpm                                 |
 
 ---
 
@@ -195,7 +195,7 @@ kagi/
 
 - **Encryption key (`KAGI_ENCRYPTION_KEY`) must be backed up securely.** If lost, all stored keys are unrecoverable.
 - Values are encrypted server-side before writing to the database and decrypted only on explicit reveal requests.
-- The AI extraction endpoint sends only key *names* and project *names* to the OpenAI API — never the actual secret values.
+- The AI extraction endpoint sends only key _names_ and project _names_ to the OpenAI API — never the actual secret values.
 - All API routes require an authenticated session (validated via `requireSession()`).
 
 ---

@@ -11,7 +11,7 @@ export interface KeyCategory {
   name: string
   description: string | null
   iconUrl: string | null
-  iconEmoji: string | null
+  iconSlug: string | null
   color: string | null
   keyType: KeyType
   // For 'simple' type: the env var name, e.g. "OPENAI_API_KEY"
@@ -28,7 +28,7 @@ export interface CreateKeyCategoryInput {
   name: string
   description?: string
   iconUrl?: string
-  iconEmoji?: string
+  iconSlug?: string
   color?: string
   keyType: KeyType
   envVarName?: string
@@ -61,7 +61,7 @@ export interface KeyEntryWithCategory extends KeyEntry {
     | 'keyType'
     | 'envVarName'
     | 'fieldDefinitions'
-    | 'iconEmoji'
+    | 'iconSlug'
     | 'iconUrl'
     | 'color'
   >
