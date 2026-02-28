@@ -26,7 +26,7 @@ const aiResponseSchema = z.object({
 
 export async function POST(request: NextRequest) {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('ai:extract')
     const body = await request.json()
     const parsed = requestSchema.safeParse(body)
 

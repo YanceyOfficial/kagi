@@ -23,7 +23,7 @@ type RouteParams = { params: Promise<{ id: string }> }
 
 export async function GET(_req: NextRequest, { params }: RouteParams) {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('categories:read')
     const { id } = await params
 
     const [row] = await db
@@ -41,7 +41,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('categories:write')
     const { id } = await params
     const body = await request.json()
     const parsed = updateSchema.safeParse(body)
@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('categories:write')
     const { id } = await params
 
     const [deleted] = await db

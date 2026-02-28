@@ -1,12 +1,14 @@
 import { relations } from 'drizzle-orm'
 import {
   boolean,
+  index,
   integer,
   jsonb,
   pgEnum,
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar
 } from 'drizzle-orm/pg-core'
@@ -144,11 +146,46 @@ export const twoFactorTokens = pgTable('two_factor_tokens', {
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 })
 
+// ─── Access Keys (Programmatic API Auth) ─────────────────────────────────────
+
+export const accessKeys = pgTable(
+  'access_keys',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 255 }).notNull(),
+    // SHA-256 hex of the full "kagi_<token>" string — never stored plaintext
+    keyHash: text('key_hash').notNull(),
+    // First 8 chars of the random portion for user-facing identification, e.g. "kagi_ab12cd34"
+    keyPrefix: varchar('key_prefix', { length: 16 }).notNull(),
+    // Granted permission scopes, e.g. ['entries:read', 'entries:reveal']
+    scopes: text('scopes').array().notNull(),
+    lastUsedAt: timestamp('last_used_at'),
+    expiresAt: timestamp('expires_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull()
+  },
+  (table) => [
+    uniqueIndex('access_keys_key_hash_idx').on(table.keyHash),
+    index('access_keys_user_id_idx').on(table.userId)
+  ]
+)
+
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const userRelations = relations(user, ({ many }) => ({
   keyCategories: many(keyCategories),
-  twoFactorTokens: many(twoFactorTokens)
+  twoFactorTokens: many(twoFactorTokens),
+  accessKeys: many(accessKeys)
+}))
+
+export const accessKeysRelations = relations(accessKeys, ({ one }) => ({
+  user: one(user, {
+    fields: [accessKeys.userId],
+    references: [user.id]
+  })
 }))
 
 export const keyCategoriesRelations = relations(

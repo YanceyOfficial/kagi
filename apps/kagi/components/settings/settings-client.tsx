@@ -10,15 +10,40 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  ALL_SCOPES,
+  SCOPE_DESCRIPTIONS,
+  type AccessKeyScope
+} from '@/lib/access-key'
 import { signOut } from '@/lib/auth/client'
+import {
+  useAccessKeys,
+  useCreateAccessKey,
+  useRevokeAccessKey
+} from '@/lib/hooks/use-access-keys'
+import type { AccessKey, CreateAccessKeyResponse } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import {
+  Check,
+  Copy,
   Download,
   KeyRound,
   Loader2,
   Lock,
+  Plus,
   ShieldCheck,
+  Terminal,
   Trash2,
   User
 } from 'lucide-react'
@@ -149,6 +174,9 @@ export function SettingsClient({ user, stats }: SettingsClientProps) {
         </CardContent>
       </Card>
 
+      {/* API Keys */}
+      <ApiKeysCard />
+
       {/* Danger Zone */}
       <DangerZone stats={stats} />
     </div>
@@ -230,6 +258,320 @@ function ExportButton() {
     </Button>
   )
 }
+
+// ── API Keys ──────────────────────────────────────────────────────────────────
+
+function ApiKeysCard() {
+  const { data: keys = [], isLoading } = useAccessKeys()
+  const [createOpen, setCreateOpen] = useState(false)
+  const [createdKey, setCreatedKey] = useState<CreateAccessKeyResponse | null>(
+    null
+  )
+
+  return (
+    <>
+      <Card className="border-border bg-card/60 backdrop-blur">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Terminal className="text-primary size-4" />
+              <CardTitle className="font-mono text-sm">API Keys</CardTitle>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 gap-1 font-mono text-xs"
+              onClick={() => setCreateOpen(true)}
+            >
+              <Plus className="size-3" />
+              New Key
+            </Button>
+          </div>
+          <CardDescription className="font-mono text-xs">
+            Programmatic access via{' '}
+            <code className="bg-muted rounded px-1">
+              Authorization: Bearer kagi_…
+            </code>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="text-muted-foreground size-4 animate-spin" />
+            </div>
+          ) : keys.length === 0 ? (
+            <p className="text-muted-foreground py-2 text-center font-mono text-xs">
+              No API keys yet
+            </p>
+          ) : (
+            <div className="divide-border divide-y">
+              {keys.map((k) => (
+                <AccessKeyRow key={k.id} accessKey={k} />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <CreateKeyDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(k) => {
+          setCreateOpen(false)
+          setCreatedKey(k)
+        }}
+      />
+
+      {createdKey && (
+        <NewKeyRevealDialog
+          accessKey={createdKey}
+          onClose={() => setCreatedKey(null)}
+        />
+      )}
+    </>
+  )
+}
+
+function AccessKeyRow({ accessKey: k }: { accessKey: AccessKey }) {
+  const revoke = useRevokeAccessKey()
+
+  return (
+    <div className="flex items-start justify-between gap-3 py-2.5">
+      <div className="min-w-0 space-y-0.5">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs font-semibold">{k.name}</span>
+          <code className="text-muted-foreground bg-muted rounded px-1 font-mono text-[10px]">
+            {k.keyPrefix}…
+          </code>
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {k.scopes.map((s) => (
+            <Badge
+              key={s}
+              variant="secondary"
+              className="font-mono text-[9px] leading-none"
+            >
+              {s}
+            </Badge>
+          ))}
+        </div>
+        <p className="text-muted-foreground font-mono text-[10px]">
+          {k.lastUsedAt
+            ? `Last used ${formatDistanceToNow(new Date(k.lastUsedAt), { addSuffix: true })}`
+            : 'Never used'}
+          {k.expiresAt &&
+            ` · Expires ${formatDistanceToNow(new Date(k.expiresAt), { addSuffix: true })}`}
+        </p>
+      </div>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="text-muted-foreground hover:text-destructive h-7 w-7 shrink-0"
+        onClick={() => revoke.mutate(k.id)}
+        disabled={revoke.isPending}
+      >
+        {revoke.isPending ? (
+          <Loader2 className="size-3 animate-spin" />
+        ) : (
+          <Trash2 className="size-3" />
+        )}
+      </Button>
+    </div>
+  )
+}
+
+function CreateKeyDialog({
+  open,
+  onOpenChange,
+  onCreated
+}: {
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  onCreated: (k: CreateAccessKeyResponse) => void
+}) {
+  const create = useCreateAccessKey()
+  const [name, setName] = useState('')
+  const [scopes, setScopes] = useState<AccessKeyScope[]>([])
+  const [expiresAt, setExpiresAt] = useState('')
+
+  function toggleScope(scope: AccessKeyScope) {
+    setScopes((prev) =>
+      prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope]
+    )
+  }
+
+  async function handleSubmit() {
+    if (!name.trim() || scopes.length === 0) return
+    const result = await create.mutateAsync({
+      name: name.trim(),
+      scopes,
+      expiresAt: expiresAt || undefined
+    })
+    setName('')
+    setScopes([])
+    setExpiresAt('')
+    onCreated(result)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-mono text-sm">New API Key</DialogTitle>
+          <DialogDescription className="font-mono text-xs">
+            Grant only the scopes you need. The key will be shown once.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-1">
+          <div className="space-y-1.5">
+            <Label className="font-mono text-xs">Name</Label>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. CI/CD Pipeline"
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="font-mono text-xs">Scopes</Label>
+            <div className="border-border max-h-52 space-y-1.5 overflow-y-auto rounded-md border p-3">
+              {ALL_SCOPES.map((scope) => (
+                <div key={scope} className="flex items-start gap-2">
+                  <Checkbox
+                    id={scope}
+                    checked={scopes.includes(scope)}
+                    onCheckedChange={() => toggleScope(scope)}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <label
+                      htmlFor={scope}
+                      className="cursor-pointer font-mono text-xs font-medium"
+                    >
+                      {scope}
+                    </label>
+                    <p className="text-muted-foreground font-mono text-[10px]">
+                      {SCOPE_DESCRIPTIONS[scope]}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="font-mono text-xs">
+              Expires at{' '}
+              <span className="text-muted-foreground">(optional)</span>
+            </Label>
+            <Input
+              type="datetime-local"
+              value={expiresAt}
+              onChange={(e) => setExpiresAt(e.target.value)}
+              className="font-mono text-sm"
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="font-mono text-sm"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={!name.trim() || scopes.length === 0 || create.isPending}
+            className="font-mono text-sm"
+          >
+            {create.isPending && (
+              <Loader2 className="mr-2 size-3.5 animate-spin" />
+            )}
+            Create Key
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function NewKeyRevealDialog({
+  accessKey,
+  onClose
+}: {
+  accessKey: CreateAccessKeyResponse
+  onClose: () => void
+}) {
+  const [copied, setCopied] = useState(false)
+
+  function handleCopy() {
+    navigator.clipboard.writeText(accessKey.key)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-mono text-sm">
+            Save your API key
+          </DialogTitle>
+          <DialogDescription className="font-mono text-xs">
+            This key is shown{' '}
+            <span className="text-destructive font-semibold">once</span> and
+            cannot be retrieved again. Copy it now.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3 py-1">
+          <div className="border-primary/30 bg-primary/5 flex items-center gap-2 rounded-md border p-3">
+            <code className="text-primary min-w-0 flex-1 break-all font-mono text-xs">
+              {accessKey.key}
+            </code>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="text-primary h-7 w-7 shrink-0"
+              onClick={handleCopy}
+            >
+              {copied ? (
+                <Check className="size-3.5" />
+              ) : (
+                <Copy className="size-3.5" />
+              )}
+            </Button>
+          </div>
+
+          <div className="text-muted-foreground space-y-1 font-mono text-[10px]">
+            <p>
+              <span className="text-foreground font-semibold">Scopes: </span>
+              {accessKey.scopes.join(', ')}
+            </p>
+            {accessKey.expiresAt && (
+              <p>
+                <span className="text-foreground font-semibold">Expires: </span>
+                {new Date(accessKey.expiresAt).toLocaleString()}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button onClick={onClose} className="w-full font-mono text-sm">
+            I&apos;ve saved the key
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ── Danger Zone ───────────────────────────────────────────────────────────────
 
 function DangerZone({ stats }: { stats: SettingsClientProps['stats'] }) {
   const [confirmText, setConfirmText] = useState('')

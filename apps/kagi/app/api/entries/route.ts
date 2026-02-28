@@ -24,7 +24,7 @@ const createSchema = z.object({
 
 export async function GET(request: NextRequest) {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('entries:read')
     const { searchParams } = new URL(request.url)
     const categoryId = searchParams.get('categoryId')
     const search = searchParams.get('search')
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('entries:write')
     const body = await request.json()
     const parsed = createSchema.safeParse(body)
 

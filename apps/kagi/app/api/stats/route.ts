@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('stats:read')
     const userId = session.user.id
     const now = new Date()
     const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)

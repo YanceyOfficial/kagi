@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('export:read')
     const userId = session.user.id
 
     const categories = await db

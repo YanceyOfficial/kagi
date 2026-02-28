@@ -9,7 +9,7 @@ type RouteParams = { params: Promise<{ id: string }> }
 
 export async function POST(_req: NextRequest, { params }: RouteParams) {
   return withAuth(async () => {
-    const session = await requireSession()
+    const session = await requireSession('entries:reveal')
     const { id } = await params
 
     const [row] = await db
