@@ -1,0 +1,36 @@
+version: 2
+updates:
+  # Root (turbo, husky, prettier, typescript)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: deps
+    open-pull-requests-limit: 10
+
+  # Main application
+  - package-ecosystem: npm
+    directory: /apps/kagi
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: deps(kagi)
+    open-pull-requests-limit: 10
+
+  # Documentation site
+  - package-ecosystem: npm
+    directory: /apps/docs
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: deps(docs)
+    open-pull-requests-limit: 5
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
