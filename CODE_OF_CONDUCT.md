@@ -34,7 +34,7 @@ This Code of Conduct applies within all project spaces (GitHub issues, PRs, disc
 
 ## Enforcement
 
-Instances of unacceptable behavior may be reported by opening a [GitHub issue](https://github.com/YanceyOfficial/kagi/issues) or contacting the maintainer directly at yanceyofficial@gmail.com. All reports will be reviewed and investigated and will result in a response deemed necessary and appropriate to the circumstances. Maintainers are obligated to maintain confidentiality with regard to the reporter.
+Instances of unacceptable behavior may be reported by opening a [GitHub issue](https://github.com/YanceyOfficial/kagi/issues) or contacting the maintainer directly at <yanceyofficial@gmail.com>. All reports will be reviewed and investigated and will result in a response deemed necessary and appropriate to the circumstances. Maintainers are obligated to maintain confidentiality with regard to the reporter.
 
 ## Attribution
 

@@ -28,7 +28,7 @@ For context when evaluating reports:
 Report via one of:
 
 1. **GitHub private security advisory** (preferred): [https://github.com/YanceyOfficial/kagi/security/advisories/new](https://github.com/YanceyOfficial/kagi/security/advisories/new)
-2. **Email**: yanceyofficial@gmail.com — use the subject line `[kagi] Security Vulnerability`.
+2. **Email**: <yanceyofficial@gmail.com> — use the subject line `[kagi] Security Vulnerability`.
 
 Please include:
 

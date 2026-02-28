@@ -38,14 +38,17 @@ The pre-commit hook runs `pnpm turbo lint` automatically.
 - Keep PRs focused — one concern per PR.
 
 **Bug fix:**
+
 - Reference the issue: `fixes #123` in the PR description.
 - Add a regression test if feasible.
 
 **New feature:**
+
 - Open an issue first to discuss the approach before writing code.
 - Include tests.
 
 **Security fix:**
+
 - Do **not** open a public PR. Follow the process in [SECURITY.md](./SECURITY.md).
 
 Commits should follow [Conventional Commits](https://www.conventionalcommits.org/):
