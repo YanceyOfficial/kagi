@@ -16,7 +16,15 @@ pnpm db:migrate   # Run pending migrations
 pnpm db:studio    # Open Drizzle Studio GUI
 ```
 
-No test suite is configured. TypeScript errors surface via `tsc --noEmit` (run manually or relied on via build).
+```bash
+pnpm test          # Unit tests (vitest)
+pnpm test:watch    # Unit tests in watch mode
+pnpm test:e2e      # E2E tests (playwright, requires dev server running)
+pnpm test:e2e:ui   # E2E tests with interactive UI
+```
+
+Unit tests live in `__tests__/unit/`. E2E tests live in `__tests__/e2e/`.
+TypeScript errors surface via `tsc --noEmit` (run manually or relied on via build).
 
 ## Architecture
 

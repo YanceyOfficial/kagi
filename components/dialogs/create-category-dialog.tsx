@@ -24,6 +24,7 @@ import {
   useCreateCategory,
   useUpdateCategory
 } from '@/lib/hooks/use-categories'
+import { buildFaviconUrl, extractDomain } from '@/lib/favicon'
 import { cn } from '@/lib/utils'
 import type { CreateKeyCategoryInput, KeyCategory, KeyType } from '@/types'
 import { useForm } from '@tanstack/react-form'
@@ -172,22 +173,6 @@ function ServiceNameCombobox({
       {error && <p className="text-destructive mt-1 text-xs">{error}</p>}
     </div>
   )
-}
-
-// ─── Google Favicon helpers ───────────────────────────────────────────────────
-
-function buildFaviconUrl(input: string): string {
-  const url = input.startsWith('http') ? input : `https://${input}`
-  return `https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=${encodeURIComponent(url)}&size=128`
-}
-
-// When editing, extract the original domain from a stored Google favicon URL
-function extractDomain(stored: string): string {
-  try {
-    const target = new URL(stored).searchParams.get('url')
-    if (target) return new URL(target).hostname
-  } catch {}
-  return stored
 }
 
 // ─── Dialog ───────────────────────────────────────────────────────────────────
