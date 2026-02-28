@@ -43,7 +43,7 @@
     "pg": "^8.19.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react-dom": "19.2.4",
     "react-monaco-editor": "^0.59.0",
     "recharts": "2.15.4",
     "simple-icons": "^16.9.0",
