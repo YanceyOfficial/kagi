@@ -39,7 +39,11 @@ const PROTECTED_ROUTES: RouteSpec[] = [
   // AI
   { method: 'post', path: '/api/ai/extract', body: { prompt: 'test' } },
   // Upload
-  { method: 'post', path: '/api/upload' }
+  { method: 'post', path: '/api/upload' },
+  // Access keys (session-only — Bearer token also rejected)
+  { method: 'get', path: '/api/access-keys' },
+  { method: 'post', path: '/api/access-keys', body: {} },
+  { method: 'delete', path: `/api/access-keys/${FAKE_ID}` }
 ]
 
 test.describe('API auth guards — status 401', () => {
@@ -66,5 +70,64 @@ test.describe('API auth guards — response body', () => {
     const res = await request.get('/api/stats')
     expect(res.status()).toBe(401)
     expect(res.headers()['content-type']).toContain('application/json')
+  })
+})
+
+test.describe('Access key Bearer auth', () => {
+  test('Bearer with non-kagi_ prefix is rejected with 401', async ({
+    request
+  }) => {
+    const res = await request.get('/api/categories', {
+      headers: { Authorization: 'Bearer sk-thisisnotakagikeyatall' }
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('Bearer kagi_ with invalid/non-existent key is rejected with 401', async ({
+    request
+  }) => {
+    const res = await request.get('/api/categories', {
+      headers: { Authorization: 'Bearer kagi_totallyfakekeyXXXXXXXXXXXXXXXXXXXX' }
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('Bearer kagi_ key is rejected by access-key management endpoints (session only)', async ({
+    request
+  }) => {
+    const res = await request.get('/api/access-keys', {
+      headers: { Authorization: 'Bearer kagi_totallyfakekeyXXXXXXXXXXXXXXXXXXXX' }
+    })
+    // Even though it's a valid prefix, these routes require session auth
+    expect(res.status()).toBe(401)
+  })
+
+  test('Bearer token without kagi_ prefix falls back to session check and returns 401', async ({
+    request
+  }) => {
+    const res = await request.get('/api/entries', {
+      headers: { Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.fake.jwt' }
+    })
+    expect(res.status()).toBe(401)
+  })
+})
+
+test.describe('Public endpoints', () => {
+  test('GET /api/openapi returns 200 without auth', async ({ request }) => {
+    const res = await request.get('/api/openapi')
+    expect(res.status()).toBe(200)
+  })
+
+  test('GET /api/openapi returns valid JSON', async ({ request }) => {
+    const res = await request.get('/api/openapi')
+    const body = await res.json()
+    expect(body.openapi).toBe('3.1.0')
+    expect(body.info.title).toBeDefined()
+    expect(body.paths).toBeDefined()
+  })
+
+  test('GET /api/openapi has cache-control header', async ({ request }) => {
+    const res = await request.get('/api/openapi')
+    expect(res.headers()['cache-control']).toContain('max-age=3600')
   })
 })
