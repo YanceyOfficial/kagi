@@ -1,0 +1,15 @@
+{
+  "name": "@kagi/eslint-config",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./next": "./next.mjs",
+    "./base": "./base.mjs"
+  },
+  "peerDependencies": {
+    "eslint": ">=9"
+  },
+  "dependencies": {
+    "eslint-config-next": "16.1.6"
+  }
+}
