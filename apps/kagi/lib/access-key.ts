@@ -13,7 +13,10 @@ export const ALL_SCOPES = [
   '2fa:reveal',
   'stats:read',
   'export:read',
-  'ai:extract'
+  'ai:extract',
+  'envs:read',
+  'envs:write',
+  'envs:reveal'
 ] as const
 
 export type AccessKeyScope = (typeof ALL_SCOPES)[number]
@@ -29,7 +32,10 @@ export const SCOPE_DESCRIPTIONS: Record<AccessKeyScope, string> = {
   '2fa:reveal': 'Decrypt and retrieve plaintext recovery tokens',
   'stats:read': 'View dashboard statistics',
   'export:read': 'Export vault metadata as JSON',
-  'ai:extract': 'Use AI to generate .env files from stored keys'
+  'ai:extract': 'Use AI to generate .env files from stored keys',
+  'envs:read': 'List and view env projects and file metadata',
+  'envs:write': 'Create, update, and delete env projects and files',
+  'envs:reveal': 'Decrypt and retrieve plaintext .env file content'
 }
 
 /**

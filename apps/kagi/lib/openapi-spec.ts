@@ -14,7 +14,10 @@ const SCOPES = [
   '2fa:reveal',
   'stats:read',
   'export:read',
-  'ai:extract'
+  'ai:extract',
+  'envs:read',
+  'envs:write',
+  'envs:reveal'
 ] as const
 
 export function buildOpenApiSpec(baseUrl: string) {
@@ -58,6 +61,10 @@ export function buildOpenApiSpec(baseUrl: string) {
       {
         name: 'Access Keys',
         description: 'Manage programmatic API access keys'
+      },
+      {
+        name: 'Env Projects',
+        description: 'Encrypted .env file storage per project'
       }
     ],
     components: {
@@ -221,6 +228,44 @@ export function buildOpenApiSpec(baseUrl: string) {
               nullable: true
             },
             createdAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        EnvFileType: {
+          type: 'string',
+          enum: ['env', 'env.local', 'env.production', 'env.development'],
+          description: 'The type of .env file'
+        },
+        EnvProject: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            userId: { type: 'string' },
+            name: { type: 'string', example: 'My Next.js App' },
+            description: { type: 'string', nullable: true },
+            fileCount: { type: 'integer', description: 'Number of env files in this project' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        EnvFile: {
+          type: 'object',
+          description: 'Env file metadata. Encrypted content is never returned — only via /reveal.',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            projectId: { type: 'string', format: 'uuid' },
+            userId: { type: 'string' },
+            fileType: { $ref: '#/components/schemas/EnvFileType' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        RevealedEnvFile: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            projectId: { type: 'string', format: 'uuid' },
+            fileType: { $ref: '#/components/schemas/EnvFileType' },
+            content: { type: 'string', description: 'Plaintext .env file content' }
           }
         }
       }
@@ -1101,6 +1146,309 @@ export function buildOpenApiSpec(baseUrl: string) {
               }
             },
             401: { description: 'Unauthorized' },
+            404: { description: 'Not found' }
+          }
+        }
+      },
+
+      // ── Env Projects ───────────────────────────────────────────────────────
+      '/envs': {
+        get: {
+          tags: ['Env Projects'],
+          summary: 'List env projects',
+          'x-required-scope': 'envs:read',
+          parameters: [
+            {
+              name: 'search',
+              in: 'query',
+              schema: { type: 'string' },
+              description: 'Case-insensitive search on name and description'
+            }
+          ],
+          responses: {
+            200: {
+              description: 'List of env projects with file counts',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'array',
+                        items: { $ref: '#/components/schemas/EnvProject' }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' }
+          }
+        },
+        post: {
+          tags: ['Env Projects'],
+          summary: 'Create an env project',
+          'x-required-scope': 'envs:write',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['name'],
+                  properties: {
+                    name: { type: 'string', minLength: 1, maxLength: 255 },
+                    description: { type: 'string', maxLength: 1000 }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            201: {
+              description: 'Created project',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { data: { $ref: '#/components/schemas/EnvProject' } }
+                  }
+                }
+              }
+            },
+            400: { description: 'Validation error' },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' }
+          }
+        }
+      },
+      '/envs/{id}': {
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+        ],
+        get: {
+          tags: ['Env Projects'],
+          summary: 'Get an env project with file metadata',
+          'x-required-scope': 'envs:read',
+          responses: {
+            200: {
+              description: 'Project with file metadata list',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        allOf: [
+                          { $ref: '#/components/schemas/EnvProject' },
+                          {
+                            type: 'object',
+                            properties: {
+                              files: {
+                                type: 'array',
+                                items: { $ref: '#/components/schemas/EnvFile' }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' },
+            404: { description: 'Not found' }
+          }
+        },
+        put: {
+          tags: ['Env Projects'],
+          summary: 'Update an env project',
+          'x-required-scope': 'envs:write',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    name: { type: 'string', minLength: 1, maxLength: 255 },
+                    description: { type: 'string', nullable: true }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            200: {
+              description: 'Updated project',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { data: { $ref: '#/components/schemas/EnvProject' } }
+                  }
+                }
+              }
+            },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' },
+            404: { description: 'Not found' }
+          }
+        },
+        delete: {
+          tags: ['Env Projects'],
+          summary: 'Delete an env project',
+          description: 'Deletes the project and all of its env files (cascade).',
+          'x-required-scope': 'envs:write',
+          responses: {
+            200: {
+              description: 'Deleted',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { data: { type: 'object', properties: { success: { type: 'boolean' } } } }
+                  }
+                }
+              }
+            },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' },
+            404: { description: 'Not found' }
+          }
+        }
+      },
+      '/envs/{id}/files': {
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Project ID' }
+        ],
+        get: {
+          tags: ['Env Projects'],
+          summary: 'List env files for a project',
+          'x-required-scope': 'envs:read',
+          responses: {
+            200: {
+              description: 'List of env file metadata',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'array',
+                        items: { $ref: '#/components/schemas/EnvFile' }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' },
+            404: { description: 'Project not found' }
+          }
+        },
+        post: {
+          tags: ['Env Projects'],
+          summary: 'Save (upsert) an env file',
+          description:
+            'Creates or replaces the env file for the given `fileType` in the project. ' +
+            'Content is encrypted server-side. Only one file per type per project.',
+          'x-required-scope': 'envs:write',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  required: ['fileType', 'content'],
+                  properties: {
+                    fileType: { $ref: '#/components/schemas/EnvFileType' },
+                    content: {
+                      type: 'string',
+                      minLength: 1,
+                      description: 'Plaintext .env file content — encrypted server-side'
+                    }
+                  }
+                }
+              }
+            }
+          },
+          responses: {
+            201: {
+              description: 'Saved env file metadata',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { data: { $ref: '#/components/schemas/EnvFile' } }
+                  }
+                }
+              }
+            },
+            400: { description: 'Validation error' },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' },
+            404: { description: 'Project not found' }
+          }
+        }
+      },
+      '/envs/{id}/files/{fileId}': {
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Project ID' },
+          { name: 'fileId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+        ],
+        delete: {
+          tags: ['Env Projects'],
+          summary: 'Delete an env file',
+          'x-required-scope': 'envs:write',
+          responses: {
+            200: {
+              description: 'Deleted',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { data: { type: 'object', properties: { success: { type: 'boolean' } } } }
+                  }
+                }
+              }
+            },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' },
+            404: { description: 'Not found' }
+          }
+        }
+      },
+      '/envs/{id}/files/{fileId}/reveal': {
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Project ID' },
+          { name: 'fileId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+        ],
+        post: {
+          tags: ['Env Projects'],
+          summary: 'Reveal plaintext .env content',
+          description:
+            'Decrypts and returns the stored .env file content. ' +
+            'Requires the `envs:reveal` scope.',
+          'x-required-scope': 'envs:reveal',
+          responses: {
+            200: {
+              description: 'Decrypted .env file content',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { data: { $ref: '#/components/schemas/RevealedEnvFile' } }
+                  }
+                }
+              }
+            },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Insufficient scope' },
             404: { description: 'Not found' }
           }
         }

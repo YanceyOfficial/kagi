@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils'
 import {
   Bot,
   ChevronDown,
+  FolderDot,
   KeyRound,
   LayoutDashboard,
   LogOut,
@@ -56,6 +57,11 @@ const navItems = [
     title: 'AI Extract',
     href: '/ai-extract',
     icon: Bot
+  },
+  {
+    title: 'Env Manager',
+    href: '/envs',
+    icon: FolderDot
   }
 ]
 

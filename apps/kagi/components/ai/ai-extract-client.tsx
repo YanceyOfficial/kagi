@@ -1,5 +1,6 @@
 'use client'
 
+import { SaveToEnvProjectDialog } from '@/components/dialogs/save-to-env-project-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,7 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import type { AiExtractResponse, AiSelectedKey, ApiSuccess } from '@/types'
 import { useMutation } from '@tanstack/react-query'
-import { Bot, Copy, Download, Loader2, Sparkles, Wand2 } from 'lucide-react'
+import { Bot, Copy, Download, Loader2, Save, Sparkles, Wand2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { EnvPreview } from './env-preview'
@@ -41,6 +42,7 @@ async function runAiExtract(prompt: string): Promise<AiExtractResponse> {
 export function AiExtractClient() {
   const [prompt, setPrompt] = useState('')
   const [result, setResult] = useState<AiExtractResponse | null>(null)
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false)
 
   const extractMutation = useMutation({
     mutationFn: runAiExtract,
@@ -206,12 +208,29 @@ export function AiExtractClient() {
                     <Download className="mr-1.5 size-3" />
                     Download .env
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSaveDialogOpen(true)}
+                    className="font-mono text-xs"
+                  >
+                    <Save className="mr-1.5 size-3" />
+                    Save to Project
+                  </Button>
                 </div>
               </div>
               <EnvPreview content={result.envContent} />
             </div>
           )}
         </div>
+      )}
+
+      {result && (
+        <SaveToEnvProjectDialog
+          open={saveDialogOpen}
+          onOpenChange={setSaveDialogOpen}
+          content={result.envContent}
+        />
       )}
     </div>
   )

@@ -29,6 +29,13 @@ export const environmentEnum = pgEnum('environment', [
   'local'
 ])
 
+export const envFileTypeEnum = pgEnum('env_file_type', [
+  'env',
+  'env.local',
+  'env.production',
+  'env.development'
+])
+
 // ─── better-auth Tables ───────────────────────────────────────────────────────
 // These are managed by better-auth; defined here so drizzle-kit can migrate them.
 
@@ -173,12 +180,51 @@ export const accessKeys = pgTable(
   ]
 )
 
+// ─── Env Manager ─────────────────────────────────────────────────────────────
+
+export const envProjects = pgTable(
+  'env_projects',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    name: varchar('name', { length: 255 }).notNull(),
+    description: text('description'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull()
+  },
+  (t) => [index('env_projects_user_id_idx').on(t.userId)]
+)
+
+export const envFiles = pgTable(
+  'env_files',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    projectId: uuid('project_id')
+      .notNull()
+      .references(() => envProjects.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    fileType: envFileTypeEnum('file_type').notNull(),
+    encryptedContent: text('encrypted_content').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull()
+  },
+  (t) => [
+    uniqueIndex('env_files_project_type_idx').on(t.projectId, t.fileType),
+    index('env_files_user_id_idx').on(t.userId)
+  ]
+)
+
 // ─── Relations ────────────────────────────────────────────────────────────────
 
 export const userRelations = relations(user, ({ many }) => ({
   keyCategories: many(keyCategories),
   twoFactorTokens: many(twoFactorTokens),
-  accessKeys: many(accessKeys)
+  accessKeys: many(accessKeys),
+  envProjects: many(envProjects)
 }))
 
 export const accessKeysRelations = relations(accessKeys, ({ one }) => ({
@@ -215,3 +261,22 @@ export const twoFactorTokensRelations = relations(
     })
   })
 )
+
+export const envProjectsRelations = relations(envProjects, ({ one, many }) => ({
+  user: one(user, {
+    fields: [envProjects.userId],
+    references: [user.id]
+  }),
+  files: many(envFiles)
+}))
+
+export const envFilesRelations = relations(envFiles, ({ one }) => ({
+  project: one(envProjects, {
+    fields: [envFiles.projectId],
+    references: [envProjects.id]
+  }),
+  user: one(user, {
+    fields: [envFiles.userId],
+    references: [user.id]
+  })
+}))
