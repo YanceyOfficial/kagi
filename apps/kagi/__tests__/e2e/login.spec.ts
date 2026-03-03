@@ -51,8 +51,12 @@ test.describe('Login page', () => {
     await btn.click()
 
     // Button text changes to "Redirecting..." and becomes disabled
-    await expect(page.getByRole('button', { name: /redirecting/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /redirecting/i })).toBeDisabled()
+    await expect(
+      page.getByRole('button', { name: /redirecting/i })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: /redirecting/i })
+    ).toBeDisabled()
   })
 
   test('SSO note is visible below the button', async ({ page }) => {

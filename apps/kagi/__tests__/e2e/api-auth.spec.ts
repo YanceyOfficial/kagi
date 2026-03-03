@@ -87,7 +87,9 @@ test.describe('Access key Bearer auth', () => {
     request
   }) => {
     const res = await request.get('/api/categories', {
-      headers: { Authorization: 'Bearer kagi_totallyfakekeyXXXXXXXXXXXXXXXXXXXX' }
+      headers: {
+        Authorization: 'Bearer kagi_totallyfakekeyXXXXXXXXXXXXXXXXXXXX'
+      }
     })
     expect(res.status()).toBe(401)
   })
@@ -96,7 +98,9 @@ test.describe('Access key Bearer auth', () => {
     request
   }) => {
     const res = await request.get('/api/access-keys', {
-      headers: { Authorization: 'Bearer kagi_totallyfakekeyXXXXXXXXXXXXXXXXXXXX' }
+      headers: {
+        Authorization: 'Bearer kagi_totallyfakekeyXXXXXXXXXXXXXXXXXXXX'
+      }
     })
     // Even though it's a valid prefix, these routes require session auth
     expect(res.status()).toBe(401)

@@ -8,7 +8,11 @@
 import { expect, test } from '@playwright/test'
 
 const MOCK_SESSION = {
-  session: { id: 'sess-1', userId: 'user-1', expiresAt: '2099-01-01T00:00:00Z' },
+  session: {
+    id: 'sess-1',
+    userId: 'user-1',
+    expiresAt: '2099-01-01T00:00:00Z'
+  },
   user: {
     id: 'user-1',
     name: 'Test User',
@@ -157,8 +161,6 @@ test.describe('Keys page empty state', () => {
   })
 
   test('search bar is visible', async ({ page }) => {
-    await expect(
-      page.getByPlaceholder('Search categories...')
-    ).toBeVisible()
+    await expect(page.getByPlaceholder('Search categories...')).toBeVisible()
   })
 })

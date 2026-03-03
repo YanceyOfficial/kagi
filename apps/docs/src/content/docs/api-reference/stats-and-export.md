@@ -38,13 +38,13 @@ HTTP/1.1 200 OK
 
 ### Response fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `totalCategories` | number | Number of key categories |
-| `totalEntries` | number | Total number of key entries |
-| `total2fa` | number | Number of 2FA tokens |
-| `byKeyType` | object | Entry count broken down by key type |
-| `byEnvironment` | object | Entry count broken down by environment |
+| Field             | Type   | Description                            |
+| ----------------- | ------ | -------------------------------------- |
+| `totalCategories` | number | Number of key categories               |
+| `totalEntries`    | number | Total number of key entries            |
+| `total2fa`        | number | Number of 2FA tokens                   |
+| `byKeyType`       | object | Entry count broken down by key type    |
+| `byEnvironment`   | object | Entry count broken down by environment |
 
 ---
 
@@ -81,7 +81,7 @@ This endpoint decrypts and returns **all secret values** in plaintext. Use it wi
 - Require the `export:read` scope explicitly — do not grant it by default.
 - Store the exported file securely and delete it when no longer needed.
 - Consider scoping access keys so that only trusted automation has this scope.
-:::
+  :::
 
 ### Format
 

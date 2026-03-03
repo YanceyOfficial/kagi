@@ -10,7 +10,11 @@
 import { expect, test } from '@playwright/test'
 
 const MOCK_SESSION = {
-  session: { id: 'sess-1', userId: 'user-1', expiresAt: '2099-01-01T00:00:00Z' },
+  session: {
+    id: 'sess-1',
+    userId: 'user-1',
+    expiresAt: '2099-01-01T00:00:00Z'
+  },
   user: {
     id: 'user-1',
     name: 'Test User',
@@ -77,7 +81,9 @@ test.describe('Keys page', () => {
   })
 
   test('renders Key Categories heading', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: /key categories/i })).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: /key categories/i })
+    ).toBeVisible()
   })
 
   test('"New Category" button is visible', async ({ page }) => {
@@ -249,15 +255,11 @@ test.describe('App sidebar navigation', () => {
   })
 
   test('sidebar contains AI Extract link', async ({ page }) => {
-    await expect(
-      page.getByRole('link', { name: /ai extract/i })
-    ).toBeVisible()
+    await expect(page.getByRole('link', { name: /ai extract/i })).toBeVisible()
   })
 
   test('sidebar contains Settings link', async ({ page }) => {
-    await expect(
-      page.getByRole('link', { name: /settings/i })
-    ).toBeVisible()
+    await expect(page.getByRole('link', { name: /settings/i })).toBeVisible()
   })
 
   test('Kagi branding is in the sidebar header', async ({ page }) => {

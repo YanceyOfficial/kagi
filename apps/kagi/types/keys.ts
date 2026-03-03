@@ -77,7 +77,9 @@ export interface CreateKeyEntryInput {
   expiresAt?: string
 }
 
-export type UpdateKeyEntryInput = Partial<Omit<CreateKeyEntryInput, 'categoryId'>>
+export type UpdateKeyEntryInput = Partial<
+  Omit<CreateKeyEntryInput, 'categoryId'>
+>
 
 // The revealed plaintext value from /api/entries/:id/reveal
 export interface RevealedKeyValue {

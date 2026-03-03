@@ -143,7 +143,8 @@ export function buildOpenApiSpec(baseUrl: string) {
         },
         KeyEntry: {
           type: 'object',
-          description: 'A per-project instance of a key category. Secret value is never included.',
+          description:
+            'A per-project instance of a key category. Secret value is never included.',
           properties: {
             id: { type: 'string', format: 'uuid' },
             categoryId: { type: 'string', format: 'uuid' },
@@ -172,7 +173,10 @@ export function buildOpenApiSpec(baseUrl: string) {
             keyType: { $ref: '#/components/schemas/KeyType' },
             value: {
               oneOf: [
-                { type: 'string', description: 'Plaintext value for simple/ssh/json' },
+                {
+                  type: 'string',
+                  description: 'Plaintext value for simple/ssh/json'
+                },
                 {
                   type: 'object',
                   additionalProperties: { type: 'string' },
@@ -191,7 +195,8 @@ export function buildOpenApiSpec(baseUrl: string) {
         },
         TwoFactorToken: {
           type: 'object',
-          description: 'A 2FA recovery token set. Tokens are never included in list/detail responses.',
+          description:
+            'A 2FA recovery token set. Tokens are never included in list/detail responses.',
           properties: {
             id: { type: 'string', format: 'uuid' },
             userId: { type: 'string' },
@@ -211,7 +216,8 @@ export function buildOpenApiSpec(baseUrl: string) {
             keyPrefix: {
               type: 'string',
               example: 'kagi_ab12cd34',
-              description: 'Display prefix for identification — not the full key'
+              description:
+                'Display prefix for identification — not the full key'
             },
             scopes: {
               type: 'array',
@@ -242,14 +248,18 @@ export function buildOpenApiSpec(baseUrl: string) {
             userId: { type: 'string' },
             name: { type: 'string', example: 'My Next.js App' },
             description: { type: 'string', nullable: true },
-            fileCount: { type: 'integer', description: 'Number of env files in this project' },
+            fileCount: {
+              type: 'integer',
+              description: 'Number of env files in this project'
+            },
             createdAt: { type: 'string', format: 'date-time' },
             updatedAt: { type: 'string', format: 'date-time' }
           }
         },
         EnvFile: {
           type: 'object',
-          description: 'Env file metadata. Encrypted content is never returned — only via /reveal.',
+          description:
+            'Env file metadata. Encrypted content is never returned — only via /reveal.',
           properties: {
             id: { type: 'string', format: 'uuid' },
             projectId: { type: 'string', format: 'uuid' },
@@ -265,7 +275,10 @@ export function buildOpenApiSpec(baseUrl: string) {
             id: { type: 'string', format: 'uuid' },
             projectId: { type: 'string', format: 'uuid' },
             fileType: { $ref: '#/components/schemas/EnvFileType' },
-            content: { type: 'string', description: 'Plaintext .env file content' }
+            content: {
+              type: 'string',
+              description: 'Plaintext .env file content'
+            }
           }
         }
       }
@@ -365,7 +378,12 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/categories/{id}': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         get: {
           tags: ['Categories'],
@@ -378,7 +396,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/KeyCategory' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/KeyCategory' }
+                    }
                   }
                 }
               }
@@ -403,7 +423,11 @@ export function buildOpenApiSpec(baseUrl: string) {
                     description: { type: 'string', nullable: true },
                     iconUrl: { type: 'string', format: 'uri', nullable: true },
                     iconSlug: { type: 'string', nullable: true },
-                    color: { type: 'string', pattern: '^#[0-9a-fA-F]{6}$', nullable: true },
+                    color: {
+                      type: 'string',
+                      pattern: '^#[0-9a-fA-F]{6}$',
+                      nullable: true
+                    },
                     envVarName: { type: 'string', nullable: true },
                     fieldDefinitions: {
                       type: 'array',
@@ -422,7 +446,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/KeyCategory' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/KeyCategory' }
+                    }
                   }
                 }
               }
@@ -444,7 +470,12 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { type: 'object', properties: { id: { type: 'string' } } } }
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: { id: { type: 'string' } }
+                      }
+                    }
                   }
                 }
               }
@@ -461,7 +492,8 @@ export function buildOpenApiSpec(baseUrl: string) {
         get: {
           tags: ['Entries'],
           summary: 'List entries',
-          description: 'Returns entry metadata. Secret values are never included.',
+          description:
+            'Returns entry metadata. Secret values are never included.',
           'x-required-scope': 'entries:read',
           parameters: [
             {
@@ -484,7 +516,10 @@ export function buildOpenApiSpec(baseUrl: string) {
                   schema: {
                     type: 'object',
                     properties: {
-                      data: { type: 'array', items: { $ref: '#/components/schemas/KeyEntry' } }
+                      data: {
+                        type: 'array',
+                        items: { $ref: '#/components/schemas/KeyEntry' }
+                      }
                     }
                   }
                 }
@@ -497,7 +532,8 @@ export function buildOpenApiSpec(baseUrl: string) {
         post: {
           tags: ['Entries'],
           summary: 'Create an entry',
-          description: 'The `value` field is encrypted server-side. Never stored or returned in plaintext.',
+          description:
+            'The `value` field is encrypted server-side. Never stored or returned in plaintext.',
           'x-required-scope': 'entries:write',
           requestBody: {
             required: true,
@@ -508,12 +544,19 @@ export function buildOpenApiSpec(baseUrl: string) {
                   required: ['categoryId', 'projectName', 'value'],
                   properties: {
                     categoryId: { type: 'string', format: 'uuid' },
-                    projectName: { type: 'string', minLength: 1, maxLength: 255 },
+                    projectName: {
+                      type: 'string',
+                      minLength: 1,
+                      maxLength: 255
+                    },
                     description: { type: 'string', maxLength: 1000 },
                     environment: { $ref: '#/components/schemas/Environment' },
                     value: {
                       oneOf: [
-                        { type: 'string', description: 'Plaintext for simple/ssh/json' },
+                        {
+                          type: 'string',
+                          description: 'Plaintext for simple/ssh/json'
+                        },
                         {
                           type: 'object',
                           additionalProperties: { type: 'string' },
@@ -536,7 +579,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/KeyEntry' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/KeyEntry' }
+                    }
                   }
                 }
               }
@@ -550,7 +595,12 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/entries/{id}': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         get: {
           tags: ['Entries'],
@@ -563,7 +613,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/KeyEntry' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/KeyEntry' }
+                    }
                   }
                 }
               }
@@ -584,18 +636,29 @@ export function buildOpenApiSpec(baseUrl: string) {
                 schema: {
                   type: 'object',
                   properties: {
-                    projectName: { type: 'string', minLength: 1, maxLength: 255 },
+                    projectName: {
+                      type: 'string',
+                      minLength: 1,
+                      maxLength: 255
+                    },
                     description: { type: 'string', nullable: true },
                     environment: { $ref: '#/components/schemas/Environment' },
                     value: {
                       oneOf: [
                         { type: 'string' },
-                        { type: 'object', additionalProperties: { type: 'string' } }
+                        {
+                          type: 'object',
+                          additionalProperties: { type: 'string' }
+                        }
                       ]
                     },
                     fileName: { type: 'string', nullable: true },
                     notes: { type: 'string', nullable: true },
-                    expiresAt: { type: 'string', format: 'date-time', nullable: true }
+                    expiresAt: {
+                      type: 'string',
+                      format: 'date-time',
+                      nullable: true
+                    }
                   }
                 }
               }
@@ -608,7 +671,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/KeyEntry' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/KeyEntry' }
+                    }
                   }
                 }
               }
@@ -629,7 +694,12 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { type: 'object', properties: { id: { type: 'string' } } } }
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: { id: { type: 'string' } }
+                      }
+                    }
                   }
                 }
               }
@@ -642,7 +712,12 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/entries/{id}/reveal': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         post: {
           tags: ['Entries'],
@@ -659,7 +734,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/RevealedEntry' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/RevealedEntry' }
+                    }
                   }
                 }
               }
@@ -718,13 +795,19 @@ export function buildOpenApiSpec(baseUrl: string) {
                   type: 'object',
                   required: ['service', 'tokens'],
                   properties: {
-                    service: { type: 'string', minLength: 1, maxLength: 255, example: 'GitHub' },
+                    service: {
+                      type: 'string',
+                      minLength: 1,
+                      maxLength: 255,
+                      example: 'GitHub'
+                    },
                     label: { type: 'string', maxLength: 255 },
                     tokens: {
                       type: 'array',
                       items: { type: 'string', minLength: 1 },
                       minItems: 1,
-                      description: 'Plaintext recovery tokens — encrypted server-side'
+                      description:
+                        'Plaintext recovery tokens — encrypted server-side'
                     }
                   }
                 }
@@ -738,7 +821,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/TwoFactorToken' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/TwoFactorToken' }
+                    }
                   }
                 }
               }
@@ -751,7 +836,12 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/2fa/{id}': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         put: {
           tags: ['2FA Tokens'],
@@ -766,7 +856,11 @@ export function buildOpenApiSpec(baseUrl: string) {
                   properties: {
                     service: { type: 'string', minLength: 1, maxLength: 255 },
                     label: { type: 'string', nullable: true },
-                    tokens: { type: 'array', items: { type: 'string' }, minItems: 1 },
+                    tokens: {
+                      type: 'array',
+                      items: { type: 'string' },
+                      minItems: 1
+                    },
                     usedCount: { type: 'integer', minimum: 0 }
                   }
                 }
@@ -780,7 +874,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/TwoFactorToken' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/TwoFactorToken' }
+                    }
                   }
                 }
               }
@@ -801,7 +897,12 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { type: 'object', properties: { id: { type: 'string' } } } }
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: { id: { type: 'string' } }
+                      }
+                    }
                   }
                 }
               }
@@ -814,7 +915,12 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/2fa/{id}/reveal': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         post: {
           tags: ['2FA Tokens'],
@@ -883,7 +989,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                             items: {
                               type: 'object',
                               properties: {
-                                environment: { $ref: '#/components/schemas/Environment' },
+                                environment: {
+                                  $ref: '#/components/schemas/Environment'
+                                },
                                 count: { type: 'integer' }
                               }
                             }
@@ -925,7 +1033,8 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'Content-Disposition': {
                   schema: {
                     type: 'string',
-                    example: 'attachment; filename="kagi-export-2025-01-01.json"'
+                    example:
+                      'attachment; filename="kagi-export-2025-01-01.json"'
                   }
                 }
               },
@@ -944,7 +1053,10 @@ export function buildOpenApiSpec(baseUrl: string) {
                         }
                       },
                       categories: { type: 'array', items: { type: 'object' } },
-                      twoFactorSets: { type: 'array', items: { type: 'object' } }
+                      twoFactorSets: {
+                        type: 'array',
+                        items: { type: 'object' }
+                      }
                     }
                   }
                 }
@@ -1082,7 +1194,8 @@ export function buildOpenApiSpec(baseUrl: string) {
                     expiresAt: {
                       type: 'string',
                       format: 'date-time',
-                      description: 'Optional expiry. Omit for a non-expiring key.'
+                      description:
+                        'Optional expiry. Omit for a non-expiring key.'
                     }
                   }
                 }
@@ -1107,7 +1220,8 @@ export function buildOpenApiSpec(baseUrl: string) {
                               key: {
                                 type: 'string',
                                 example: 'kagi_aBcDeFgH...',
-                                description: 'Plaintext key — shown once, not stored'
+                                description:
+                                  'Plaintext key — shown once, not stored'
                               }
                             }
                           }
@@ -1125,12 +1239,18 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/access-keys/{id}': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         delete: {
           tags: ['Access Keys'],
           summary: 'Revoke an access key',
-          description: 'Permanently revokes the access key. Active requests using this key will immediately return 401.',
+          description:
+            'Permanently revokes the access key. Active requests using this key will immediately return 401.',
           responses: {
             200: {
               description: 'Key revoked',
@@ -1139,7 +1259,10 @@ export function buildOpenApiSpec(baseUrl: string) {
                   schema: {
                     type: 'object',
                     properties: {
-                      data: { type: 'object', properties: { id: { type: 'string' } } }
+                      data: {
+                        type: 'object',
+                        properties: { id: { type: 'string' } }
+                      }
                     }
                   }
                 }
@@ -1212,7 +1335,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/EnvProject' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/EnvProject' }
+                    }
                   }
                 }
               }
@@ -1225,7 +1350,12 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/envs/{id}': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         get: {
           tags: ['Env Projects'],
@@ -1288,7 +1418,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/EnvProject' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/EnvProject' }
+                    }
                   }
                 }
               }
@@ -1301,7 +1433,8 @@ export function buildOpenApiSpec(baseUrl: string) {
         delete: {
           tags: ['Env Projects'],
           summary: 'Delete an env project',
-          description: 'Deletes the project and all of its env files (cascade).',
+          description:
+            'Deletes the project and all of its env files (cascade).',
           'x-required-scope': 'envs:write',
           responses: {
             200: {
@@ -1310,7 +1443,12 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { type: 'object', properties: { success: { type: 'boolean' } } } }
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: { success: { type: 'boolean' } }
+                      }
+                    }
                   }
                 }
               }
@@ -1323,7 +1461,13 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/envs/{id}/files': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Project ID' }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' },
+            description: 'Project ID'
+          }
         ],
         get: {
           tags: ['Env Projects'],
@@ -1370,7 +1514,8 @@ export function buildOpenApiSpec(baseUrl: string) {
                     content: {
                       type: 'string',
                       minLength: 1,
-                      description: 'Plaintext .env file content — encrypted server-side'
+                      description:
+                        'Plaintext .env file content — encrypted server-side'
                     }
                   }
                 }
@@ -1384,7 +1529,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/EnvFile' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/EnvFile' }
+                    }
                   }
                 }
               }
@@ -1398,8 +1545,19 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/envs/{id}/files/{fileId}': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Project ID' },
-          { name: 'fileId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' },
+            description: 'Project ID'
+          },
+          {
+            name: 'fileId',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         delete: {
           tags: ['Env Projects'],
@@ -1412,7 +1570,12 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { type: 'object', properties: { success: { type: 'boolean' } } } }
+                    properties: {
+                      data: {
+                        type: 'object',
+                        properties: { success: { type: 'boolean' } }
+                      }
+                    }
                   }
                 }
               }
@@ -1425,8 +1588,19 @@ export function buildOpenApiSpec(baseUrl: string) {
       },
       '/envs/{id}/files/{fileId}/reveal': {
         parameters: [
-          { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Project ID' },
-          { name: 'fileId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' },
+            description: 'Project ID'
+          },
+          {
+            name: 'fileId',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' }
+          }
         ],
         post: {
           tags: ['Env Projects'],
@@ -1442,7 +1616,9 @@ export function buildOpenApiSpec(baseUrl: string) {
                 'application/json': {
                   schema: {
                     type: 'object',
-                    properties: { data: { $ref: '#/components/schemas/RevealedEnvFile' } }
+                    properties: {
+                      data: { $ref: '#/components/schemas/RevealedEnvFile' }
+                    }
                   }
                 }
               }

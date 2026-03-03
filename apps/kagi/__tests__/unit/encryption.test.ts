@@ -76,7 +76,9 @@ describe('encryptJson / decryptJson', () => {
 describe('getMasterKey error handling', () => {
   it('throws when KAGI_ENCRYPTION_KEY is not set', () => {
     delete process.env.KAGI_ENCRYPTION_KEY
-    expect(() => encrypt('test')).toThrow('KAGI_ENCRYPTION_KEY environment variable is not set')
+    expect(() => encrypt('test')).toThrow(
+      'KAGI_ENCRYPTION_KEY environment variable is not set'
+    )
   })
 
   it('throws when key is wrong length', () => {

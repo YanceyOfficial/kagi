@@ -11,6 +11,7 @@ A clear and concise description of the problem.
 
 **To reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '...'
 3. See error
@@ -19,6 +20,7 @@ Steps to reproduce the behavior:
 What you expected to happen.
 
 **Environment**
+
 - Browser: [e.g. Chrome 124, Firefox 125]
 - OS: [e.g. macOS 15, Ubuntu 22.04]
 - Kagi version / commit: [e.g. `git rev-parse --short HEAD`]

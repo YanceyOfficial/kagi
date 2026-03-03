@@ -6,10 +6,10 @@ Kagi stores encrypted secrets. Security issues are taken seriously — please di
 
 Kagi is a self-hosted application distributed as source code. Only the latest commit on `master` receives security fixes. If you are running an older version, please update before reporting.
 
-| Version | Supported |
-|---------|-----------|
-| latest (`master`) | yes |
-| older commits | no |
+| Version           | Supported |
+| ----------------- | --------- |
+| latest (`master`) | yes       |
+| older commits     | no        |
 
 ## Encryption Model
 

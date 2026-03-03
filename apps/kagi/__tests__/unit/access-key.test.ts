@@ -88,12 +88,16 @@ describe('generateAccessKey', () => {
   })
 
   it('produces unique keys on every call', () => {
-    const keys = new Set(Array.from({ length: 20 }, () => generateAccessKey().key))
+    const keys = new Set(
+      Array.from({ length: 20 }, () => generateAccessKey().key)
+    )
     expect(keys.size).toBe(20)
   })
 
   it('produces unique hashes on every call', () => {
-    const hashes = new Set(Array.from({ length: 20 }, () => generateAccessKey().hash))
+    const hashes = new Set(
+      Array.from({ length: 20 }, () => generateAccessKey().hash)
+    )
     expect(hashes.size).toBe(20)
   })
 })

@@ -25,20 +25,20 @@ Note: `encryptedValue` is **never** included in responses. Use the `/reveal` end
 
 ### Environment
 
-| Value | Description |
-|-------|-------------|
-| `development` | Dev environment |
-| `staging` | Staging environment |
-| `production` | Production environment |
+| Value         | Description            |
+| ------------- | ---------------------- |
+| `development` | Dev environment        |
+| `staging`     | Staging environment    |
+| `production`  | Production environment |
 
 ### Value formats by KeyType
 
-| KeyType | Value format |
-|---------|-------------|
-| `simple` | Plain string (e.g., `"sk-abc123"`) |
-| `group` | JSON object of field name → value pairs |
-| `ssh` | PEM-encoded private key string |
-| `json` | JSON credential object (stringified) |
+| KeyType  | Value format                            |
+| -------- | --------------------------------------- |
+| `simple` | Plain string (e.g., `"sk-abc123"`)      |
+| `group`  | JSON object of field name → value pairs |
+| `ssh`    | PEM-encoded private key string          |
+| `json`   | JSON credential object (stringified)    |
 
 ---
 
@@ -89,13 +89,13 @@ Content-Type: application/json
 
 ### Request body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `categoryId` | UUID | yes | Parent category ID |
-| `name` | string | yes | Project name (e.g. "Blog Project") |
-| `value` | string | yes | Plaintext secret value (encrypted server-side) |
-| `environment` | string | no | `development`, `staging`, or `production` |
-| `notes` | string | no | Optional notes |
+| Field         | Type   | Required | Description                                    |
+| ------------- | ------ | -------- | ---------------------------------------------- |
+| `categoryId`  | UUID   | yes      | Parent category ID                             |
+| `name`        | string | yes      | Project name (e.g. "Blog Project")             |
+| `value`       | string | yes      | Plaintext secret value (encrypted server-side) |
+| `environment` | string | no       | `development`, `staging`, or `production`      |
+| `notes`       | string | no       | Optional notes                                 |
 
 ```json
 {

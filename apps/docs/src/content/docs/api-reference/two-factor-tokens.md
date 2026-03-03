@@ -66,12 +66,12 @@ Content-Type: application/json
 
 ### Request body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `service` | string | yes | Service name (e.g. "GitHub") |
-| `accountName` | string | yes | Account identifier (e.g. email) |
-| `secret` | string | yes | TOTP secret key (base32 encoded) |
-| `notes` | string | no | Optional notes |
+| Field         | Type   | Required | Description                      |
+| ------------- | ------ | -------- | -------------------------------- |
+| `service`     | string | yes      | Service name (e.g. "GitHub")     |
+| `accountName` | string | yes      | Account identifier (e.g. email)  |
+| `secret`      | string | yes      | TOTP secret key (base32 encoded) |
+| `notes`       | string | no       | Optional notes                   |
 
 ```json
 {
@@ -175,9 +175,9 @@ HTTP/1.1 200 OK
 }
 ```
 
-| Field | Description |
-|-------|-------------|
-| `code` | Current 6-digit TOTP code |
+| Field              | Description                                                |
+| ------------------ | ---------------------------------------------------------- |
+| `code`             | Current 6-digit TOTP code                                  |
 | `remainingSeconds` | Seconds until the code expires (TOTP period is 30 seconds) |
 
 Returns **404** if the token does not exist, is not owned by the authenticated user, or cannot be decrypted.

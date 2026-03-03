@@ -3,7 +3,7 @@ title: Categories
 description: API reference for key category endpoints.
 ---
 
-Categories define the *type* and *format* of a key (e.g. "OpenAI API", "AWS Credentials"). Each category has a key type that determines how its entries are stored and displayed.
+Categories define the _type_ and _format_ of a key (e.g. "OpenAI API", "AWS Credentials"). Each category has a key type that determines how its entries are stored and displayed.
 
 ## Schemas
 
@@ -25,12 +25,12 @@ Categories define the *type* and *format* of a key (e.g. "OpenAI API", "AWS Cred
 
 ### KeyType
 
-| Value | Description |
-|-------|-------------|
-| `simple` | Single environment variable (string) |
-| `group` | Multiple named fields (e.g. AWS access key + secret) |
-| `ssh` | SSH private key file content |
-| `json` | JSON credential file (e.g. GCP service account) |
+| Value    | Description                                          |
+| -------- | ---------------------------------------------------- |
+| `simple` | Single environment variable (string)                 |
+| `group`  | Multiple named fields (e.g. AWS access key + secret) |
+| `ssh`    | SSH private key file content                         |
+| `json`   | JSON credential file (e.g. GCP service account)      |
 
 ---
 
@@ -77,13 +77,13 @@ Content-Type: application/json
 
 ### Request body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | yes | Display name (e.g. "OpenAI API") |
-| `keyType` | `simple` \| `group` \| `ssh` \| `json` | yes | Key type |
-| `envVarName` | string | yes for `simple` | Environment variable name |
-| `icon` | string | no | Simple Icons slug (e.g. `"openai"`) |
-| `description` | string | no | Optional description |
+| Field         | Type                                   | Required         | Description                         |
+| ------------- | -------------------------------------- | ---------------- | ----------------------------------- |
+| `name`        | string                                 | yes              | Display name (e.g. "OpenAI API")    |
+| `keyType`     | `simple` \| `group` \| `ssh` \| `json` | yes              | Key type                            |
+| `envVarName`  | string                                 | yes for `simple` | Environment variable name           |
+| `icon`        | string                                 | no               | Simple Icons slug (e.g. `"openai"`) |
+| `description` | string                                 | no               | Optional description                |
 
 ```json
 {
@@ -125,9 +125,9 @@ GET /api/categories/{id}
 
 ### Path parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `id` | Category UUID |
+| Parameter | Description   |
+| --------- | ------------- |
+| `id`      | Category UUID |
 
 ### Response
 

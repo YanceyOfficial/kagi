@@ -28,9 +28,9 @@ Content-Type: application/json
 
 ### Request body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `prompt` | string | yes | Natural language description of your project |
+| Field    | Type   | Required | Description                                  |
+| -------- | ------ | -------- | -------------------------------------------- |
+| `prompt` | string | yes      | Natural language description of your project |
 
 ```json
 {
@@ -69,7 +69,7 @@ The response is a plain-text `.env`-formatted file containing only the entries t
 
 - Be specific about the services and libraries your project uses.
 - Mention the environment (e.g., "production deployment" vs "local dev").
-- If results are incomplete, list the services explicitly: *"I need OpenAI, Stripe, and Supabase keys."*
+- If results are incomplete, list the services explicitly: _"I need OpenAI, Stripe, and Supabase keys."_
 
 ### Limitations
 

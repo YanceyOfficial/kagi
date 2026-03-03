@@ -1,4 +1,8 @@
-export type EnvFileType = 'env' | 'env.local' | 'env.production' | 'env.development'
+export type EnvFileType =
+  | 'env'
+  | 'env.local'
+  | 'env.production'
+  | 'env.development'
 
 export const ENV_FILE_TYPES: EnvFileType[] = [
   'env',

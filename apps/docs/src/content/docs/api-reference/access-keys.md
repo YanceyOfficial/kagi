@@ -66,11 +66,11 @@ Content-Type: application/json
 
 ### Request body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | yes | Descriptive name (e.g. `"ci-pipeline"`) |
-| `scopes` | string[] | yes | One or more [scopes](/authentication/scopes/) |
-| `expiresAt` | ISO 8601 date | no | Expiry date. Omit for no expiry. |
+| Field       | Type          | Required | Description                                   |
+| ----------- | ------------- | -------- | --------------------------------------------- |
+| `name`      | string        | yes      | Descriptive name (e.g. `"ci-pipeline"`)       |
+| `scopes`    | string[]      | yes      | One or more [scopes](/authentication/scopes/) |
+| `expiresAt` | ISO 8601 date | no       | Expiry date. Omit for no expiry.              |
 
 Valid scope values: `categories:read`, `categories:write`, `entries:read`, `entries:write`, `entries:reveal`, `2fa:read`, `2fa:write`, `2fa:reveal`, `stats:read`, `export:read`, `ai:extract`.
 
@@ -113,9 +113,9 @@ DELETE /api/access-keys/{id}
 
 ### Path parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `id` | Access key UUID |
+| Parameter | Description     |
+| --------- | --------------- |
+| `id`      | Access key UUID |
 
 ### Response
 

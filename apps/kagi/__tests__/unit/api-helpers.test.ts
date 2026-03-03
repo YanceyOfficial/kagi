@@ -6,7 +6,10 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('next/server', () => ({
   NextResponse: {
     json: (data: unknown, init?: ResponseInit) =>
-      ({ _body: data, _status: (init as { status?: number })?.status ?? 200 }) as unknown as Response
+      ({
+        _body: data,
+        _status: (init as { status?: number })?.status ?? 200
+      }) as unknown as Response
   }
 }))
 
@@ -77,7 +80,9 @@ describe('withAuth', () => {
     })
     const { body, status } = unwrap(res)
     expect(status).toBe(403)
-    expect((body as { error: string }).error).toContain('Insufficient permissions')
+    expect((body as { error: string }).error).toContain(
+      'Insufficient permissions'
+    )
   })
 
   it('returns 500 when handler throws a generic Error', async () => {

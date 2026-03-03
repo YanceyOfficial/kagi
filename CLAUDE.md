@@ -58,18 +58,18 @@ Unit tests: `apps/kagi/__tests__/unit/`. E2E tests: `apps/kagi/__tests__/e2e/`.
 
 Five application tables on top of the four better-auth tables (`user`, `session`, `account`, `verification`):
 
-| Table | Description |
-|-------|-------------|
-| `key_categories` | Key type definitions (name, keyType, envVarName, icon, color) |
-| `key_entries` | Per-project instances of a category; holds `encryptedValue` |
-| `two_factor_tokens` | Encrypted 2FA recovery token arrays per service |
-| `access_keys` | Programmatic API keys (SHA-256 hashed, scoped, optional expiry) |
+| Table               | Description                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| `key_categories`    | Key type definitions (name, keyType, envVarName, icon, color)   |
+| `key_entries`       | Per-project instances of a category; holds `encryptedValue`     |
+| `two_factor_tokens` | Encrypted 2FA recovery token arrays per service                 |
+| `access_keys`       | Programmatic API keys (SHA-256 hashed, scoped, optional expiry) |
 
 **Do not remove the better-auth tables** (`user`, `session`, `account`, `verification`) — drizzle-kit needs them to manage migrations.
 
 ### Two-Level Key Structure
 
-1. **Key Category** (`key_categories`) — defines the *type* and *format* of a key (e.g. "OpenAI API"). Belongs to a `userId`.
+1. **Key Category** (`key_categories`) — defines the _type_ and _format_ of a key (e.g. "OpenAI API"). Belongs to a `userId`.
 2. **Key Entry** (`key_entries`) — a per-project instance of a category (e.g. "OpenAI for Blog project"). Stores the encrypted value.
 
 `KeyType` enum: `simple` (single env var) | `group` (multi-field JSON map) | `ssh` (file content) | `json` (credential file).
@@ -95,7 +95,7 @@ Two auth methods, resolved inside `requireSession(requiredScope?)`:
 ```ts
 export async function GET() {
   return withAuth(async () => {
-    const session = await requireSession('entries:read')  // pass scope for access-key enforcement
+    const session = await requireSession('entries:read') // pass scope for access-key enforcement
     // session.user.id is always available
   })
 }
@@ -115,22 +115,22 @@ export async function GET() {
 
 ### API Routes (`app/api/`)
 
-| Route | Auth |
-|-------|------|
-| `GET /api/openapi` | Public (no auth) |
-| `GET/POST /api/categories` | `categories:read` / `categories:write` |
+| Route                                 | Auth                                   |
+| ------------------------------------- | -------------------------------------- |
+| `GET /api/openapi`                    | Public (no auth)                       |
+| `GET/POST /api/categories`            | `categories:read` / `categories:write` |
 | `GET/PUT/DELETE /api/categories/[id]` | `categories:read` / `categories:write` |
-| `GET/POST /api/entries` | `entries:read` / `entries:write` |
-| `GET/PUT/DELETE /api/entries/[id]` | `entries:read` / `entries:write` |
-| `POST /api/entries/[id]/reveal` | `entries:reveal` |
-| `GET/POST /api/2fa` | `2fa:read` / `2fa:write` |
-| `PUT/DELETE /api/2fa/[id]` | `2fa:write` |
-| `POST /api/2fa/[id]/reveal` | `2fa:reveal` |
-| `GET /api/stats` | `stats:read` |
-| `GET /api/export` | `export:read` |
-| `POST /api/ai/extract` | `ai:extract` |
-| `GET/POST /api/access-keys` | Any valid auth (no scope required) |
-| `DELETE /api/access-keys/[id]` | Any valid auth (no scope required) |
+| `GET/POST /api/entries`               | `entries:read` / `entries:write`       |
+| `GET/PUT/DELETE /api/entries/[id]`    | `entries:read` / `entries:write`       |
+| `POST /api/entries/[id]/reveal`       | `entries:reveal`                       |
+| `GET/POST /api/2fa`                   | `2fa:read` / `2fa:write`               |
+| `PUT/DELETE /api/2fa/[id]`            | `2fa:write`                            |
+| `POST /api/2fa/[id]/reveal`           | `2fa:reveal`                           |
+| `GET /api/stats`                      | `stats:read`                           |
+| `GET /api/export`                     | `export:read`                          |
+| `POST /api/ai/extract`                | `ai:extract`                           |
+| `GET/POST /api/access-keys`           | Any valid auth (no scope required)     |
+| `DELETE /api/access-keys/[id]`        | Any valid auth (no scope required)     |
 
 Ownership is always enforced: joins or `where` clauses include `userId = session.user.id`. Routes never return `encryptedValue` — destructured out with `const { encryptedValue: _ev, ...safeEntry } = row`.
 
@@ -142,13 +142,13 @@ Ownership is always enforced: joins or `where` clauses include `userId = session
 
 All client-side HTTP goes through React Query hooks in `lib/hooks/`:
 
-| Hook file | Hooks |
-|-----------|-------|
-| `use-categories.ts` | `useCategories`, `useCategory`, `useCreateCategory`, `useUpdateCategory`, `useDeleteCategory` |
-| `use-entries.ts` | `useEntries`, `useEntry`, `useRevealEntry`, `useCreateEntry`, `useUpdateEntry`, `useDeleteEntry` |
-| `use-2fa.ts` | `use2faTokens`, `useReveal2fa`, `useCreate2fa`, `useUpdate2fa`, `useDelete2fa` |
-| `use-stats.ts` | `useStats` |
-| `use-access-keys.ts` | `useAccessKeys`, `useCreateAccessKey`, `useRevokeAccessKey` |
+| Hook file            | Hooks                                                                                            |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| `use-categories.ts`  | `useCategories`, `useCategory`, `useCreateCategory`, `useUpdateCategory`, `useDeleteCategory`    |
+| `use-entries.ts`     | `useEntries`, `useEntry`, `useRevealEntry`, `useCreateEntry`, `useUpdateEntry`, `useDeleteEntry` |
+| `use-2fa.ts`         | `use2faTokens`, `useReveal2fa`, `useCreate2fa`, `useUpdate2fa`, `useDelete2fa`                   |
+| `use-stats.ts`       | `useStats`                                                                                       |
+| `use-access-keys.ts` | `useAccessKeys`, `useCreateAccessKey`, `useRevokeAccessKey`                                      |
 
 No direct `fetch` calls in components.
 
@@ -164,7 +164,10 @@ All forms use **TanStack React Form** with inline Zod validators:
   }}
 >
   {(field) => (
-    <Input value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+    <Input
+      value={field.state.value}
+      onChange={(e) => field.handleChange(e.target.value)}
+    />
   )}
 </form.Field>
 ```

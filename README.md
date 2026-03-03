@@ -91,23 +91,24 @@ pnpm format         # Prettier
 
 ## Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Framework | Next.js 16 (App Router) |
-| Database | PostgreSQL + Drizzle ORM |
-| Auth | better-auth + Keycloak (genericOAuth) |
-| UI | shadcn/ui + Tailwind CSS v4 |
-| State | React Query + Jotai |
-| Forms | TanStack Form + Zod |
-| AI | Vercel AI SDK + OpenAI gpt-4o-mini |
-| Docs | Astro Starlight |
-| Monorepo | Turborepo + pnpm |
+| Layer     | Choice                                |
+| --------- | ------------------------------------- |
+| Framework | Next.js 16 (App Router)               |
+| Database  | PostgreSQL + Drizzle ORM              |
+| Auth      | better-auth + Keycloak (genericOAuth) |
+| UI        | shadcn/ui + Tailwind CSS v4           |
+| State     | React Query + Jotai                   |
+| Forms     | TanStack Form + Zod                   |
+| AI        | Vercel AI SDK + OpenAI gpt-4o-mini    |
+| Docs      | Astro Starlight                       |
+| Monorepo  | Turborepo + pnpm                      |
 
 ## Security
 
 Security is the core concern of this project. See [SECURITY.md](./SECURITY.md) for the vulnerability disclosure policy.
 
 Key design decisions:
+
 - Secret values are **never** returned by list or detail API endpoints — only via explicit `POST /api/entries/[id]/reveal`
 - Encryption key (`KAGI_ENCRYPTION_KEY`) is never stored in the database
 - AI extraction is privacy-preserving: the model only receives key names and project names
