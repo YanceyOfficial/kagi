@@ -21,7 +21,7 @@ import {
   SidebarRail,
   SidebarSeparator
 } from '@/components/ui/sidebar'
-import { signOut, useSession } from '@/lib/auth/client'
+import { signOut } from '@/lib/auth/client'
 import { cn } from '@/lib/utils'
 import {
   Bot,
@@ -73,9 +73,12 @@ const secondaryItems = [
   }
 ]
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  user: { name: string; email: string; image?: string | null } | null
+}
+
+export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname()
-  const { data: session } = useSession()
 
   function isActive(href: string) {
     if (href === '/') return pathname === href
@@ -88,8 +91,8 @@ export function AppSidebar() {
     })
   }
 
-  const userInitials = session?.user?.name
-    ? session.user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+  const userInitials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : ''
 
   return (
@@ -176,23 +179,17 @@ export function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" className="font-mono">
                   <Avatar className="size-7 rounded-md">
-                    <AvatarImage src={session?.user?.image ?? undefined} />
-                    <AvatarFallback suppressHydrationWarning className="bg-primary/20 text-primary rounded-md font-mono text-xs">
+                    <AvatarImage src={user?.image ?? undefined} />
+                    <AvatarFallback className="bg-primary/20 text-primary rounded-md font-mono text-xs">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-left leading-none">
-                    <span
-                      suppressHydrationWarning
-                      className="truncate text-sm font-semibold"
-                    >
-                      {session?.user?.name ?? ''}
+                    <span className="truncate text-sm font-semibold">
+                      {user?.name ?? ''}
                     </span>
-                    <span
-                      suppressHydrationWarning
-                      className="text-muted-foreground truncate text-xs"
-                    >
-                      {session?.user?.email ?? ''}
+                    <span className="text-muted-foreground truncate text-xs">
+                      {user?.email ?? ''}
                     </span>
                   </div>
                   <ChevronDown className="ml-auto size-3 shrink-0" />

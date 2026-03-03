@@ -1,12 +1,17 @@
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { Providers } from '@/components/providers'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const sessionData = await auth.api.getSession({ headers: await headers() })
+  const user = sessionData?.user ?? null
+
   return (
     <Providers>
       <SidebarProvider
@@ -17,7 +22,7 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
-        <AppSidebar />
+        <AppSidebar user={user} />
         <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </Providers>
