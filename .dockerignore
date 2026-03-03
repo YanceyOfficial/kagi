@@ -1,0 +1,33 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (reinstalled inside Docker)
+node_modules
+**/node_modules
+
+# Build artefacts
+.next
+**/.next
+.turbo
+**/.turbo
+out
+
+# Environment files — real secrets are injected at runtime
+.env
+.env.*
+!.env.example
+
+# Docs app is not part of the production image
+apps/docs
+
+# Test files
+**/__tests__
+**/*.test.ts
+**/*.spec.ts
+**/*.spec.js
+
+# Editor / OS artefacts
+.DS_Store
+.vscode
+*.log
