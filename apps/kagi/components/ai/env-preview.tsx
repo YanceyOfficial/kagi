@@ -35,7 +35,6 @@ export function EnvPreview({ content, readOnly = true }: EnvPreviewProps) {
           wordWrap: 'on',
           folding: false,
           glyphMargin: false,
-          lineDecorationsWidth: 0,
           renderLineHighlight: 'line',
           scrollbar: { vertical: 'auto', horizontal: 'hidden' },
           padding: { top: 12, bottom: 12 }

@@ -19,18 +19,28 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { buildFaviconUrl, extractDomain } from '@/lib/favicon'
 import {
   useCategories,
   useCreateCategory,
   useUpdateCategory
 } from '@/lib/hooks/use-categories'
-import { buildFaviconUrl, extractDomain } from '@/lib/favicon'
 import { cn } from '@/lib/utils'
 import type { CreateKeyCategoryInput, KeyCategory, KeyType } from '@/types'
 import { useForm } from '@tanstack/react-form'
 import { Check, Loader2, Plus, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { z } from 'zod'
+
+// Converts a service name to a valid UPPER_SNAKE_CASE env var name.
+// e.g. "Github OAuth" → "GITHUB_OAUTH", "AWS S3 Bucket" → "AWS_S3_BUCKET"
+function toEnvVarName(name: string): string {
+  return name
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+}
 
 // ─── Service Name Combobox ────────────────────────────────────────────────────
 
@@ -214,6 +224,9 @@ export function CreateCategoryDialog({
   const existingNames = allCategories.map((c) => c.name)
 
   const [newField, setNewField] = useState('')
+  // Tracks whether the user has manually typed in envVarName.
+  // While false, the field is auto-derived from the service name.
+  const userEditedEnvVar = useRef(false)
 
   const form = useForm({
     defaultValues: {
@@ -267,6 +280,7 @@ export function CreateCategoryDialog({
       fieldDefinitions: editTarget?.fieldDefinitions ?? []
     })
     setNewField('')
+    userEditedEnvVar.current = false
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
@@ -315,7 +329,12 @@ export function CreateCategoryDialog({
                 </Label>
                 <ServiceNameCombobox
                   value={field.state.value}
-                  onChange={(v) => field.handleChange(v)}
+                  onChange={(v) => {
+                    field.handleChange(v)
+                    if (!userEditedEnvVar.current) {
+                      form.setFieldValue('envVarName', toEnvVarName(v))
+                    }
+                  }}
                   existingNames={existingNames}
                   excludeName={editTarget?.name}
                   error={
@@ -368,7 +387,10 @@ export function CreateCategoryDialog({
                       <Input
                         placeholder="e.g. OPENAI_API_KEY"
                         value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
+                        onChange={(e) => {
+                          userEditedEnvVar.current = true
+                          field.handleChange(e.target.value)
+                        }}
                         className="font-mono text-sm uppercase"
                       />
                       <p className="text-muted-foreground text-xs">
@@ -379,66 +401,72 @@ export function CreateCategoryDialog({
                 </form.Field>
               ) : keyType === 'group' ? (
                 <form.Field name="fieldDefinitions">
-                  {(field) => (
-                    <div className="space-y-2">
-                      <Label className="text-xs">Field Definitions</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Add field name, e.g. AWS_REGION"
-                          value={newField}
-                          onChange={(e) => setNewField(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
+                  {(field) => {
+                    // Guard against non-array state during type transitions
+                    const defs = Array.isArray(field.state.value)
+                      ? field.state.value
+                      : []
+                    return (
+                      <div className="space-y-2">
+                        <Label className="text-xs">Field Definitions</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder="Add field name, e.g. AWS_REGION"
+                            value={newField}
+                            onChange={(e) => setNewField(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                const t = newField.trim().toUpperCase()
+                                if (t && !defs.includes(t)) {
+                                  field.handleChange([...defs, t])
+                                  setNewField('')
+                                }
+                              }
+                            }}
+                            className="font-mono text-sm"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
                               const t = newField.trim().toUpperCase()
-                              if (t && !field.state.value.includes(t)) {
-                                field.handleChange([...field.state.value, t])
+                              if (t && !defs.includes(t)) {
+                                field.handleChange([...defs, t])
                                 setNewField('')
                               }
-                            }
-                          }}
-                          className="font-mono text-sm"
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => {
-                            const t = newField.trim().toUpperCase()
-                            if (t && !field.state.value.includes(t)) {
-                              field.handleChange([...field.state.value, t])
-                              setNewField('')
-                            }
-                          }}
-                        >
-                          <Plus className="size-4" />
-                        </Button>
-                      </div>
-                      {field.state.value.length > 0 && (
-                        <div className="border-border bg-muted/30 flex flex-wrap gap-1.5 rounded border p-2">
-                          {field.state.value.map((f) => (
-                            <span
-                              key={f}
-                              className="bg-secondary inline-flex items-center gap-1 rounded px-2 py-0.5 font-mono text-xs"
-                            >
-                              {f}
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  field.handleChange(
-                                    field.state.value.filter((x) => x !== f)
-                                  )
-                                }
-                                className="text-muted-foreground hover:text-foreground"
-                              >
-                                <X className="size-2.5" />
-                              </button>
-                            </span>
-                          ))}
+                            }}
+                          >
+                            <Plus className="size-4" />
+                          </Button>
                         </div>
-                      )}
-                    </div>
-                  )}
+                        {defs.length > 0 && (
+                          <div className="border-border bg-muted/30 flex flex-wrap gap-1.5 rounded border p-2">
+                            {defs.map((f) => (
+                              <span
+                                key={f}
+                                className="bg-secondary inline-flex items-center gap-1 rounded px-2 py-0.5 font-mono text-xs"
+                              >
+                                {f}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    field.handleChange(
+                                      defs.filter((x) => x !== f)
+                                    )
+                                  }
+                                  className="text-muted-foreground hover:text-foreground"
+                                >
+                                  <X className="size-2.5" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }}
                 </form.Field>
               ) : null
             }

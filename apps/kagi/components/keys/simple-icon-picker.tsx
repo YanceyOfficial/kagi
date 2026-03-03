@@ -25,7 +25,6 @@ function getIcon(slug: string): SimpleIcon | undefined {
   return (si as unknown as Record<string, SimpleIcon | undefined>)[varName]
 }
 
-
 function iconFill(hex: string): string {
   return isHexDark(hex) ? '#ffffff' : `#${hex}`
 }

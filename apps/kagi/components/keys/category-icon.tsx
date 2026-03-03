@@ -28,7 +28,6 @@ function getIcon(slug: string): SimpleIcon | undefined {
   return (si as unknown as Record<string, SimpleIcon | undefined>)[varName]
 }
 
-
 export function CategoryIcon({
   category,
   size = 'md',
