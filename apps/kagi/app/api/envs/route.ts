@@ -1,6 +1,7 @@
 import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { envFiles, envProjects } from '@/lib/db/schema'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, count, eq, ilike, or } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
     const parsed = createSchema.safeParse(body)
 
     if (!parsed.success) {
-      return apiError(parsed.error.message)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
     }
 
     const [row] = await db

@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { keyCategories, keyEntries } from '@/lib/db/schema'
 import { decrypt, decryptJson } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -23,7 +24,7 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
         and(eq(keyEntries.id, id), eq(keyCategories.userId, session.user.id))
       )
 
-    if (!row) return apiError('Entry not found', 404)
+    if (!row) return apiError('Entry not found', 404, ErrorCode.ENTRY_NOT_FOUND)
 
     const { entry, category } = row
     const keyType = category.keyType

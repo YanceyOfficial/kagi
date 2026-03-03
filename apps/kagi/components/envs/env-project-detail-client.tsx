@@ -6,7 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useDeleteEnvProject, useEnvProject } from '@/lib/hooks/use-envs'
-import { ENV_FILE_TYPES, type EnvFile, type EnvFileType, type EnvProject } from '@/types'
+import {
+  ENV_FILE_TYPES,
+  type EnvFile,
+  type EnvFileType,
+  type EnvProject
+} from '@/types'
 import { ArrowLeft, FolderDot, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'

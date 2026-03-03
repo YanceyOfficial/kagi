@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { twoFactorTokens } from '@/lib/db/schema'
 import { encryptJson } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq, ilike, or } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -54,7 +55,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const parsed = createSchema.safeParse(body)
 
-    if (!parsed.success) return apiError(parsed.error.message)
+    if (!parsed.success)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
 
     const { service, label, tokens } = parsed.data
 

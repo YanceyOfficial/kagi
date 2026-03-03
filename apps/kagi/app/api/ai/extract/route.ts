@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { keyCategories, keyEntries } from '@/lib/db/schema'
 import { decrypt, decryptJson } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { openai } from '@ai-sdk/openai'
 import { generateObject } from 'ai'
 import { eq } from 'drizzle-orm'
@@ -30,7 +31,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const parsed = requestSchema.safeParse(body)
 
-    if (!parsed.success) return apiError(parsed.error.message)
+    if (!parsed.success)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
 
     const { prompt } = parsed.data
 

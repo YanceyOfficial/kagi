@@ -31,7 +31,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 const ENV_COLORS: Record<string, string> = {
   production: 'border-emerald-700/50 bg-emerald-950/30 text-emerald-400',
@@ -70,7 +70,7 @@ export function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
         .join('\n')
     }
     navigator.clipboard.writeText(text)
-    toast.success('Copied to clipboard')
+    sileo.success({ title: 'Copied to clipboard' })
   }
 
   function handleDownload() {

@@ -1,4 +1,5 @@
 import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
+import { ErrorCode } from '@/lib/error-codes'
 import { NextRequest, NextResponse } from 'next/server'
 
 const ALLOWED_TYPES = new Set([
@@ -26,19 +27,25 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file')
 
     if (!(file instanceof File)) {
-      return apiError('No file provided')
+      return apiError('No file provided', 400, ErrorCode.UPLOAD_NO_FILE)
     }
 
     if (file.size > MAX_SIZE_BYTES) {
       return apiError(
-        `File too large — maximum size is ${MAX_SIZE_BYTES / 1024} KB`
+        `File too large — maximum size is ${MAX_SIZE_BYTES / 1024} KB`,
+        400,
+        ErrorCode.UPLOAD_FILE_TOO_LARGE
       )
     }
 
     // Allow common key/credential types plus unknown octet streams
     const contentType = file.type || 'application/octet-stream'
     if (!ALLOWED_TYPES.has(contentType) && !contentType.startsWith('text/')) {
-      return apiError(`Unsupported file type: ${contentType}`)
+      return apiError(
+        `Unsupported file type: ${contentType}`,
+        400,
+        ErrorCode.UPLOAD_INVALID_TYPE
+      )
     }
 
     const content = await file.text()

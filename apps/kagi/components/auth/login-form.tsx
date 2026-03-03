@@ -11,7 +11,7 @@ import {
 import { signIn } from '@/lib/auth/client'
 import { KeyRound, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false)
@@ -23,13 +23,13 @@ export function LoginForm() {
         { providerId: 'keycloak' },
         {
           onError: (ctx) => {
-            toast.error(ctx.error.message ?? 'Authentication failed')
+            sileo.error({ title: ctx.error.message ?? 'Authentication failed' })
             setLoading(false)
           }
         }
       )
     } catch {
-      toast.error('Failed to initiate login')
+      sileo.error({ title: 'Failed to initiate login' })
       setLoading(false)
     }
   }

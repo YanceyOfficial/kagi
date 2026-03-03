@@ -89,13 +89,8 @@ export function AppSidebar() {
   }
 
   const userInitials = session?.user?.name
-    ? session.user.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : '??'
+    ? session.user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : ''
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -182,15 +177,21 @@ export function AppSidebar() {
                 <SidebarMenuButton size="lg" className="font-mono">
                   <Avatar className="size-7 rounded-md">
                     <AvatarImage src={session?.user?.image ?? undefined} />
-                    <AvatarFallback className="bg-primary/20 text-primary rounded-md font-mono text-xs">
+                    <AvatarFallback suppressHydrationWarning className="bg-primary/20 text-primary rounded-md font-mono text-xs">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-left leading-none">
-                    <span className="truncate text-sm font-semibold">
-                      {session?.user?.name ?? 'User'}
+                    <span
+                      suppressHydrationWarning
+                      className="truncate text-sm font-semibold"
+                    >
+                      {session?.user?.name ?? ''}
                     </span>
-                    <span className="text-muted-foreground truncate text-xs">
+                    <span
+                      suppressHydrationWarning
+                      className="text-muted-foreground truncate text-xs"
+                    >
                       {session?.user?.email ?? ''}
                     </span>
                   </div>

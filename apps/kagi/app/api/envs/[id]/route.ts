@@ -1,6 +1,7 @@
 import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { envFiles, envProjects } from '@/lib/db/schema'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -26,7 +27,12 @@ export async function GET(
       )
       .limit(1)
 
-    if (!project) return apiError('Not found', 404)
+    if (!project)
+      return apiError(
+        'Env project not found',
+        404,
+        ErrorCode.ENV_PROJECT_NOT_FOUND
+      )
 
     const files = await db
       .select({
@@ -57,7 +63,7 @@ export async function PUT(
     const parsed = updateSchema.safeParse(body)
 
     if (!parsed.success) {
-      return apiError(parsed.error.message)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
     }
 
     const [existing] = await db
@@ -68,7 +74,12 @@ export async function PUT(
       )
       .limit(1)
 
-    if (!existing) return apiError('Not found', 404)
+    if (!existing)
+      return apiError(
+        'Env project not found',
+        404,
+        ErrorCode.ENV_PROJECT_NOT_FOUND
+      )
 
     const updates: Partial<typeof envProjects.$inferInsert> = {
       updatedAt: new Date()
@@ -103,7 +114,12 @@ export async function DELETE(
       )
       .limit(1)
 
-    if (!existing) return apiError('Not found', 404)
+    if (!existing)
+      return apiError(
+        'Env project not found',
+        404,
+        ErrorCode.ENV_PROJECT_NOT_FOUND
+      )
 
     await db.delete(envProjects).where(eq(envProjects.id, id))
 

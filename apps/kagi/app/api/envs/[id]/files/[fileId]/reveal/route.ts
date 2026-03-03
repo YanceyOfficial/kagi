@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { envFiles } from '@/lib/db/schema'
 import { decrypt } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -16,12 +17,11 @@ export async function POST(
     const [file] = await db
       .select()
       .from(envFiles)
-      .where(
-        and(eq(envFiles.id, fileId), eq(envFiles.userId, session.user.id))
-      )
+      .where(and(eq(envFiles.id, fileId), eq(envFiles.userId, session.user.id)))
       .limit(1)
 
-    if (!file) return apiError('Not found', 404)
+    if (!file)
+      return apiError('Env file not found', 404, ErrorCode.ENV_FILE_NOT_FOUND)
 
     const content = decrypt(file.encryptedContent)
 

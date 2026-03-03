@@ -11,10 +11,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  useCreateEnvProject,
-  useUpdateEnvProject
-} from '@/lib/hooks/use-envs'
+import { useCreateEnvProject, useUpdateEnvProject } from '@/lib/hooks/use-envs'
 import type { EnvProject } from '@/types'
 import { useForm } from '@tanstack/react-form'
 import { Loader2 } from 'lucide-react'
@@ -155,9 +152,7 @@ export function CreateEnvProjectDialog({
               disabled={isPending}
               className="font-mono text-sm"
             >
-              {isPending && (
-                <Loader2 className="mr-2 size-3.5 animate-spin" />
-              )}
+              {isPending && <Loader2 className="mr-2 size-3.5 animate-spin" />}
               {isEditing ? 'Save Changes' : 'Create Project'}
             </Button>
           </div>

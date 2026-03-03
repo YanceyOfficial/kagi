@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { envFiles, envProjects } from '@/lib/db/schema'
 import { encrypt } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -27,7 +28,12 @@ export async function GET(
       )
       .limit(1)
 
-    if (!project) return apiError('Not found', 404)
+    if (!project)
+      return apiError(
+        'Env project not found',
+        404,
+        ErrorCode.ENV_PROJECT_NOT_FOUND
+      )
 
     const files = await db
       .select({
@@ -40,10 +46,7 @@ export async function GET(
       })
       .from(envFiles)
       .where(
-        and(
-          eq(envFiles.projectId, id),
-          eq(envFiles.userId, session.user.id)
-        )
+        and(eq(envFiles.projectId, id), eq(envFiles.userId, session.user.id))
       )
 
     return NextResponse.json({ data: files })
@@ -61,7 +64,7 @@ export async function POST(
     const parsed = saveSchema.safeParse(body)
 
     if (!parsed.success) {
-      return apiError(parsed.error.message)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
     }
 
     const [project] = await db
@@ -72,7 +75,12 @@ export async function POST(
       )
       .limit(1)
 
-    if (!project) return apiError('Not found', 404)
+    if (!project)
+      return apiError(
+        'Env project not found',
+        404,
+        ErrorCode.ENV_PROJECT_NOT_FOUND
+      )
 
     const encryptedContent = encrypt(parsed.data.content)
 

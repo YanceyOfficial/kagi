@@ -1,6 +1,7 @@
+import { ApiError, throwIfError } from '@/lib/api-client'
 import type { ApiSuccess, KeyCategory } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 async function fetchCategories(search?: string): Promise<KeyCategory[]> {
   const url = new URL('/api/categories', window.location.origin)
@@ -27,18 +28,16 @@ export function useCreateCategory() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to create category')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to create category')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['categories'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
-      toast.success('Category created')
+      sileo.success({ title: 'Category created' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -54,17 +53,15 @@ export function useUpdateCategory() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to update category')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to update category')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['categories'] })
-      toast.success('Category updated')
+      sileo.success({ title: 'Category updated' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -73,17 +70,15 @@ export function useDeleteCategory() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to delete category')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to delete category')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['categories'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
-      toast.success('Category deleted')
+      sileo.success({ title: 'Category deleted' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }

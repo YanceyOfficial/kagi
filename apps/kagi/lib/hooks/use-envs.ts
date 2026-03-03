@@ -1,3 +1,4 @@
+import { ApiError, throwIfError } from '@/lib/api-client'
 import type {
   ApiSuccess,
   CreateEnvFileInput,
@@ -9,7 +10,7 @@ import type {
   UpdateEnvProjectInput
 } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 // ─── Projects ─────────────────────────────────────────────────────────────────
 
@@ -51,18 +52,16 @@ export function useCreateEnvProject() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to create project')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to create project')
       const json: ApiSuccess<EnvProject> = await res.json()
       return json.data
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['envs'] })
-      toast.success('Project created')
+      sileo.success({ title: 'Project created' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -78,19 +77,17 @@ export function useUpdateEnvProject() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to update project')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to update project')
       const json: ApiSuccess<EnvProject> = await res.json()
       return json.data
     },
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['envs', variables.id] })
       qc.invalidateQueries({ queryKey: ['envs'] })
-      toast.success('Project updated')
+      sileo.success({ title: 'Project updated' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -99,17 +96,15 @@ export function useDeleteEnvProject() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/envs/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to delete project')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to delete project')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['envs'] })
-      toast.success('Project deleted')
+      sileo.success({ title: 'Project deleted' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -127,19 +122,17 @@ export function useSaveEnvFile() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to save env file')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to save env file')
       const json: ApiSuccess<EnvFile> = await res.json()
       return json.data
     },
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['envs', variables.projectId] })
       qc.invalidateQueries({ queryKey: ['envs'] })
-      toast.success('Saved')
+      sileo.success({ title: 'File saved' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -152,18 +145,15 @@ export function useRevealEnvFile() {
       projectId: string
       fileId: string
     }) => {
-      const res = await fetch(
-        `/api/envs/${projectId}/files/${fileId}/reveal`,
-        { method: 'POST' }
-      )
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to reveal env file')
-      }
+      const res = await fetch(`/api/envs/${projectId}/files/${fileId}/reveal`, {
+        method: 'POST'
+      })
+      if (!res.ok) await throwIfError(res, 'Failed to reveal env file')
       const json: ApiSuccess<RevealedEnvFile> = await res.json()
       return json.data
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -180,17 +170,15 @@ export function useDeleteEnvFile() {
       const res = await fetch(`/api/envs/${projectId}/files/${fileId}`, {
         method: 'DELETE'
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to delete env file')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to delete env file')
       return res.json()
     },
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['envs', variables.projectId] })
       qc.invalidateQueries({ queryKey: ['envs'] })
-      toast.success('File deleted')
+      sileo.success({ title: 'File deleted' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }

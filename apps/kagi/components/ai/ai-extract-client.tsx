@@ -14,9 +14,17 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import type { AiExtractResponse, AiSelectedKey, ApiSuccess } from '@/types'
 import { useMutation } from '@tanstack/react-query'
-import { Bot, Copy, Download, Loader2, Save, Sparkles, Wand2 } from 'lucide-react'
+import {
+  Bot,
+  Copy,
+  Download,
+  Loader2,
+  Save,
+  Sparkles,
+  Wand2
+} from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 import { EnvPreview } from './env-preview'
 
 const EXAMPLE_PROMPTS = [
@@ -49,12 +57,14 @@ export function AiExtractClient() {
     onSuccess: (data) => {
       setResult(data)
       if (data.selectedKeys.length === 0) {
-        toast.info('No matching keys found — try rephrasing your prompt')
+        sileo.info({
+          title: 'No matching keys found — try rephrasing your prompt'
+        })
       } else {
-        toast.success(`Found ${data.selectedKeys.length} key(s)`)
+        sileo.success({ title: `Found ${data.selectedKeys.length} key(s)` })
       }
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: Error) => sileo.error({ title: err.message })
   })
 
   function handleSubmit(e: React.FormEvent) {
@@ -66,7 +76,7 @@ export function AiExtractClient() {
   function handleCopyEnv() {
     if (!result) return
     navigator.clipboard.writeText(result.envContent)
-    toast.success('Copied .env content to clipboard')
+    sileo.success({ title: 'Copied .env content to clipboard' })
   }
 
   function handleDownloadEnv() {

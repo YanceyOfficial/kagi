@@ -9,8 +9,9 @@ import {
 import type { EnvFile, EnvFileType } from '@/types'
 import { Copy, Download, Eye, Loader2, Save, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 import { EnvFileEditor } from './env-file-editor'
+import { SecretGenerator } from './secret-generator'
 
 interface EnvFileTabProps {
   projectId: string
@@ -42,10 +43,14 @@ export function EnvFileTab({
 
   async function handleSave() {
     if (!editContent.trim()) {
-      toast.error('Nothing to save — add some content first')
+      sileo.error({ title: 'Nothing to save — add some content first' })
       return
     }
-    await saveMutation.mutateAsync({ projectId, fileType, content: editContent })
+    await saveMutation.mutateAsync({
+      projectId,
+      fileType,
+      content: editContent
+    })
     setRevealedContent(editContent)
   }
 
@@ -63,7 +68,7 @@ export function EnvFileTab({
     const content = revealedContent ?? editContent
     if (!content) return
     navigator.clipboard.writeText(content)
-    toast.success('Copied to clipboard')
+    sileo.success({ title: 'Copied to clipboard' })
   }
 
   function handleDownload() {
@@ -138,6 +143,16 @@ export function EnvFileTab({
               Download
             </Button>
           </>
+        )}
+
+        {showEditor && (
+          <SecretGenerator
+            onInsert={(secret) =>
+              setEditContent((prev) =>
+                prev ? `${prev.trimEnd()}\n${secret}` : secret
+              )
+            }
+          />
         )}
 
         {existingFile && revealedContent !== null && (

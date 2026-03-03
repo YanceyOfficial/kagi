@@ -25,7 +25,7 @@ import {
 import { ENV_FILE_TYPES, type EnvFileType } from '@/types'
 import { Loader2, Save } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 const FILE_TYPE_LABELS: Record<EnvFileType, string> = {
   env: '.env',
@@ -67,7 +67,9 @@ export function SaveToEnvProjectDialog({
     }
 
     if (!projectId) {
-      toast.error('Please select a project or enter a new project name')
+      sileo.error({
+        title: 'Please select a project or enter a new project name'
+      })
       return
     }
 
@@ -82,9 +84,10 @@ export function SaveToEnvProjectDialog({
       projects.find((p) => p.id === projectId)?.name ||
       'project'
 
-    toast.success(
-      `Saved to ${projectName} as ${FILE_TYPE_LABELS[selectedFileType]}`
-    )
+    sileo.success({
+      title: `Saved to ${projectName}`,
+      description: FILE_TYPE_LABELS[selectedFileType]
+    })
     onOpenChange(false)
     setSelectedProjectId('')
     setNewProjectName('')

@@ -1,3 +1,4 @@
+import { ApiError, throwIfError } from '@/lib/api-client'
 import type {
   ApiSuccess,
   CreateKeyEntryInput,
@@ -5,7 +6,7 @@ import type {
   RevealedKeyValue
 } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 async function fetchEntries(
   categoryId?: string,
@@ -31,14 +32,12 @@ export function useRevealEntry() {
   return useMutation({
     mutationFn: async (id: string): Promise<RevealedKeyValue> => {
       const res = await fetch(`/api/entries/${id}/reveal`, { method: 'POST' })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to reveal key')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to reveal key')
       const json: ApiSuccess<RevealedKeyValue> = await res.json()
       return json.data
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -51,19 +50,17 @@ export function useCreateEntry() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to create entry')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to create entry')
       return res.json()
     },
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ['entries', variables.categoryId] })
       qc.invalidateQueries({ queryKey: ['entries'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
-      toast.success('Key entry created')
+      sileo.success({ title: 'Key entry created' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -79,17 +76,15 @@ export function useUpdateEntry() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to update entry')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to update entry')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['entries'] })
-      toast.success('Key entry updated')
+      sileo.success({ title: 'Key entry updated' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -98,18 +93,16 @@ export function useDeleteEntry() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/entries/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to delete entry')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to delete entry')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['entries'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
-      toast.success('Key entry deleted')
+      sileo.success({ title: 'Key entry deleted' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -122,10 +115,7 @@ export function useUploadFile() {
         method: 'POST',
         body: formData
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Upload failed')
-      }
+      if (!res.ok) await throwIfError(res, 'Upload failed')
       const json: ApiSuccess<{
         fileName: string
         contentType: string
@@ -133,6 +123,7 @@ export function useUploadFile() {
       }> = await res.json()
       return json.data
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }

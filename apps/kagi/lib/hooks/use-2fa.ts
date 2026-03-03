@@ -1,3 +1,4 @@
+import { ApiError, throwIfError } from '@/lib/api-client'
 import type {
   ApiSuccess,
   CreateTwoFactorTokenInput,
@@ -5,7 +6,7 @@ import type {
   TwoFactorToken
 } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 async function fetchTwoFactorTokens(
   search?: string
@@ -29,14 +30,12 @@ export function useRevealTwoFactor() {
   return useMutation({
     mutationFn: async (id: string): Promise<RevealedTwoFactorTokens> => {
       const res = await fetch(`/api/2fa/${id}/reveal`, { method: 'POST' })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to reveal tokens')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to reveal tokens')
       const json: ApiSuccess<RevealedTwoFactorTokens> = await res.json()
       return json.data
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -49,18 +48,16 @@ export function useCreateTwoFactor() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to create 2FA token set')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to create 2FA token set')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['2fa'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
-      toast.success('2FA recovery tokens saved')
+      sileo.success({ title: '2FA recovery tokens saved' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -69,17 +66,15 @@ export function useDeleteTwoFactor() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/2fa/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to delete')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to delete 2FA token set')
       return res.json()
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['2fa'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
-      toast.success('2FA token set deleted')
+      sileo.success({ title: '2FA token set deleted' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }

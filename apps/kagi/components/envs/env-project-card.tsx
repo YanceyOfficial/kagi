@@ -17,7 +17,13 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import type { EnvProject } from '@/types'
-import { FileText, FolderDot, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import {
+  FileText,
+  FolderDot,
+  MoreHorizontal,
+  Pencil,
+  Trash2
+} from 'lucide-react'
 import Link from 'next/link'
 
 interface EnvProjectCardProps {
@@ -37,7 +43,7 @@ export function EnvProjectCard({
         <div className="flex items-start justify-between gap-2">
           <Link
             href={`/envs/${project.id}`}
-            className="flex min-w-0 flex-1 items-center gap-3"
+            className="flex min-w-0 flex-1 gap-3"
           >
             <div className="bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-md">
               <FolderDot className="size-4" />
@@ -47,7 +53,7 @@ export function EnvProjectCard({
                 {project.name}
               </CardTitle>
               {project.description && (
-                <CardDescription className="mt-0.5 line-clamp-1 font-mono text-xs">
+                <CardDescription className="mt-0.5 line-clamp-2 font-mono text-xs">
                   {project.description}
                 </CardDescription>
               )}

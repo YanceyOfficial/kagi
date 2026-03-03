@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { keyCategories, keyEntries } from '@/lib/db/schema'
 import { encrypt, encryptJson } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -38,7 +39,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     const { id } = await params
 
     const row = await getEntryWithOwnership(id, session.user.id)
-    if (!row) return apiError('Entry not found', 404)
+    if (!row) return apiError('Entry not found', 404, ErrorCode.ENTRY_NOT_FOUND)
 
     const { encryptedValue: _ev, ...safeEntry } = row.entry
 
@@ -55,10 +56,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const body = await request.json()
     const parsed = updateSchema.safeParse(body)
 
-    if (!parsed.success) return apiError(parsed.error.message)
+    if (!parsed.success)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
 
     const row = await getEntryWithOwnership(id, session.user.id)
-    if (!row) return apiError('Entry not found', 404)
+    if (!row) return apiError('Entry not found', 404, ErrorCode.ENTRY_NOT_FOUND)
 
     const { value, expiresAt, ...rest } = parsed.data
     const updates: Partial<typeof keyEntries.$inferInsert> = {
@@ -91,7 +93,7 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
     const { id } = await params
 
     const row = await getEntryWithOwnership(id, session.user.id)
-    if (!row) return apiError('Entry not found', 404)
+    if (!row) return apiError('Entry not found', 404, ErrorCode.ENTRY_NOT_FOUND)
 
     await db.delete(keyEntries).where(eq(keyEntries.id, id))
 

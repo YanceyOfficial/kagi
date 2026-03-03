@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { twoFactorTokens } from '@/lib/db/schema'
 import { decryptJson } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -22,7 +23,12 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
         )
       )
 
-    if (!row) return apiError('2FA token set not found', 404)
+    if (!row)
+      return apiError(
+        '2FA token set not found',
+        404,
+        ErrorCode.TWO_FACTOR_NOT_FOUND
+      )
 
     const tokens = decryptJson<string[]>(row.encryptedTokens)
 

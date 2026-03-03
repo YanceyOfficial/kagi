@@ -10,6 +10,7 @@ import {
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { accessKeys } from '@/lib/db/schema'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq, gt, isNull, or } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -17,7 +18,8 @@ import { NextResponse } from 'next/server'
 export class AuthError extends Error {
   constructor(
     message = 'Unauthorized',
-    public readonly status = 401
+    public readonly status = 401,
+    public readonly code: ErrorCode = ErrorCode.AUTH_REQUIRED
   ) {
     super(message)
   }
@@ -57,7 +59,12 @@ export async function requireSession(requiredScope?: AccessKeyScope) {
       )
       .limit(1)
 
-    if (!key) throw new AuthError('Invalid or expired access key')
+    if (!key)
+      throw new AuthError(
+        'Invalid or expired access key',
+        401,
+        ErrorCode.AUTH_INVALID_KEY
+      )
 
     // Fire-and-forget lastUsedAt update — don't await, don't block the request
     db.update(accessKeys)
@@ -70,7 +77,8 @@ export async function requireSession(requiredScope?: AccessKeyScope) {
   } else {
     // ── Session cookie auth ──────────────────────────────────────────────────
     const session = await auth.api.getSession({ headers: allHeaders })
-    if (!session) throw new AuthError()
+    if (!session)
+      throw new AuthError('Unauthorized', 401, ErrorCode.AUTH_REQUIRED)
     userId = session.user.id
     scopes = null // null = full access (no scope restriction for browser sessions)
   }
@@ -78,7 +86,8 @@ export async function requireSession(requiredScope?: AccessKeyScope) {
   if (requiredScope && scopes !== null && !scopes.includes(requiredScope)) {
     throw new AuthError(
       `Insufficient permissions: '${requiredScope}' scope required`,
-      403
+      403,
+      ErrorCode.AUTH_SCOPE_REQUIRED
     )
   }
 
@@ -95,15 +104,25 @@ export async function withAuth(handler: () => Promise<NextResponse<any>>) {
     return await handler()
   } catch (err) {
     if (err instanceof AuthError) {
-      return NextResponse.json({ error: err.message }, { status: err.status })
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: err.status }
+      )
     }
     console.error('[API Error]', err)
     const message = err instanceof Error ? err.message : 'Internal server error'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json(
+      { error: message, code: ErrorCode.INTERNAL_ERROR },
+      { status: 500 }
+    )
   }
 }
 
-/** Standard JSON error response. */
-export function apiError(message: string, status = 400) {
-  return NextResponse.json({ error: message }, { status })
+/** Standard JSON error response with a machine-readable code. */
+export function apiError(
+  message: string,
+  status = 400,
+  code: ErrorCode = ErrorCode.VALIDATION_ERROR
+) {
+  return NextResponse.json({ error: message, code }, { status })
 }

@@ -30,7 +30,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 interface TwoFaCardProps {
   token: TwoFactorToken
@@ -54,12 +54,12 @@ export function TwoFaCard({ token, onDelete }: TwoFaCardProps) {
   function handleCopyAll() {
     if (!revealed) return
     navigator.clipboard.writeText(revealed.tokens.join('\n'))
-    toast.success('All tokens copied to clipboard')
+    sileo.success({ title: 'All tokens copied to clipboard' })
   }
 
   function handleCopyToken(t: string) {
     navigator.clipboard.writeText(t)
-    toast.success('Token copied')
+    sileo.success({ title: 'Token copied' })
   }
 
   const remainingCount = token.totalCount - token.usedCount

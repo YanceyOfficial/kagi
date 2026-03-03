@@ -33,6 +33,7 @@ export default defineConfig({
           label: 'API Reference',
           items: [
             { label: 'Overview', slug: 'api-reference/overview' },
+            { label: 'Error Codes', slug: 'api-reference/errors' },
             { label: 'Categories', slug: 'api-reference/categories' },
             { label: 'Entries', slug: 'api-reference/entries' },
             {

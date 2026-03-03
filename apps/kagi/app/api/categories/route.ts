@@ -1,6 +1,7 @@
 import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { keyCategories, keyEntries } from '@/lib/db/schema'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, count, eq, ilike, or } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     const parsed = createSchema.safeParse(body)
 
     if (!parsed.success) {
-      return apiError(parsed.error.message)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
     }
 
     const {
@@ -83,13 +84,21 @@ export async function POST(request: NextRequest) {
 
     // Validate type-specific fields
     if (keyType === 'simple' && !envVarName) {
-      return apiError('envVarName is required for simple key type')
+      return apiError(
+        'envVarName is required for simple key type',
+        400,
+        ErrorCode.CATEGORY_SIMPLE_REQUIRES_ENV_VAR
+      )
     }
     if (
       keyType === 'group' &&
       (!fieldDefinitions || fieldDefinitions.length === 0)
     ) {
-      return apiError('fieldDefinitions are required for group key type')
+      return apiError(
+        'fieldDefinitions are required for group key type',
+        400,
+        ErrorCode.CATEGORY_GROUP_REQUIRES_FIELDS
+      )
     }
 
     const [row] = await db

@@ -2,6 +2,7 @@ import { ALL_SCOPES, generateAccessKey } from '@/lib/access-key'
 import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { accessKeys } from '@/lib/db/schema'
+import { ErrorCode } from '@/lib/error-codes'
 import { asc, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -39,7 +40,12 @@ export async function POST(req: NextRequest) {
     const session = await requireSession()
     const body = await req.json()
     const parsed = createSchema.safeParse(body)
-    if (!parsed.success) return apiError(parsed.error.issues[0].message)
+    if (!parsed.success)
+      return apiError(
+        parsed.error.issues[0].message,
+        400,
+        ErrorCode.VALIDATION_ERROR
+      )
 
     const { name, scopes, expiresAt } = parsed.data
     const { key, hash, keyPrefix } = generateAccessKey()

@@ -1,3 +1,4 @@
+import { ApiError, throwIfError } from '@/lib/api-client'
 import type {
   AccessKey,
   ApiSuccess,
@@ -5,7 +6,7 @@ import type {
   CreateAccessKeyResponse
 } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 export function useAccessKeys() {
   return useQuery({
@@ -28,15 +29,20 @@ export function useCreateAccessKey() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input)
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to create access key')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to create access key')
       const json: ApiSuccess<CreateAccessKeyResponse> = await res.json()
       return json.data
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['access-keys'] }),
-    onError: (err: Error) => toast.error(err.message)
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['access-keys'] })
+      sileo.warning({
+        title: 'Access key created — save it now',
+        description:
+          'The plaintext key is shown only once and cannot be retrieved later.'
+      })
+    },
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
 
@@ -45,15 +51,13 @@ export function useRevokeAccessKey() {
   return useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/access-keys/${id}`, { method: 'DELETE' })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'Failed to revoke access key')
-      }
+      if (!res.ok) await throwIfError(res, 'Failed to revoke access key')
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['access-keys'] })
-      toast.success('Access key revoked')
+      sileo.success({ title: 'Access key revoked' })
     },
-    onError: (err: Error) => toast.error(err.message)
+    onError: (err: ApiError) =>
+      sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }

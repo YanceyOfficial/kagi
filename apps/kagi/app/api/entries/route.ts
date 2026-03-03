@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { keyCategories, keyEntries } from '@/lib/db/schema'
 import { encrypt, encryptJson } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq, ilike, or } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -81,7 +82,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const parsed = createSchema.safeParse(body)
 
-    if (!parsed.success) return apiError(parsed.error.message)
+    if (!parsed.success)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
 
     const {
       categoryId,
@@ -105,7 +107,8 @@ export async function POST(request: NextRequest) {
         )
       )
 
-    if (!category) return apiError('Category not found', 404)
+    if (!category)
+      return apiError('Category not found', 404, ErrorCode.CATEGORY_NOT_FOUND)
 
     // Encrypt the value based on key type
     let encryptedValue: string

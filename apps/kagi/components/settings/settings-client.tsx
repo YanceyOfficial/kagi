@@ -48,7 +48,7 @@ import {
   User
 } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { sileo } from 'sileo'
 
 interface SettingsClientProps {
   user: {
@@ -234,9 +234,9 @@ function ExportButton() {
       a.download = match?.[1] ?? 'kagi-export.json'
       a.click()
       URL.revokeObjectURL(url)
-      toast.success('Export downloaded')
+      sileo.success({ title: 'Export downloaded' })
     } catch {
-      toast.error('Export failed')
+      sileo.error({ title: 'Export failed' })
     } finally {
       setLoading(false)
     }
@@ -530,7 +530,7 @@ function NewKeyRevealDialog({
 
         <div className="space-y-3 py-1">
           <div className="border-primary/30 bg-primary/5 flex items-center gap-2 rounded-md border p-3">
-            <code className="text-primary min-w-0 flex-1 break-all font-mono text-xs">
+            <code className="text-primary min-w-0 flex-1 font-mono text-xs break-all">
               {accessKey.key}
             </code>
             <Button
@@ -585,12 +585,12 @@ function DangerZone({ stats }: { stats: SettingsClientProps['stats'] }) {
     try {
       const res = await fetch('/api/account/data', { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed')
-      toast.success('All vault data deleted')
+      sileo.success({ title: 'All vault data deleted' })
       await signOut({
         fetchOptions: { onSuccess: () => window.location.assign('/login') }
       })
     } catch {
-      toast.error('Failed to delete data')
+      sileo.error({ title: 'Failed to delete data' })
       setLoading(false)
     }
   }

@@ -2,6 +2,7 @@ import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { twoFactorTokens } from '@/lib/db/schema'
 import { encryptJson } from '@/lib/encryption'
+import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -22,7 +23,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     const body = await request.json()
     const parsed = updateSchema.safeParse(body)
 
-    if (!parsed.success) return apiError(parsed.error.message)
+    if (!parsed.success)
+      return apiError(parsed.error.message, 400, ErrorCode.VALIDATION_ERROR)
 
     const { tokens, ...rest } = parsed.data
     const updates: Partial<typeof twoFactorTokens.$inferInsert> = {
@@ -46,7 +48,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       )
       .returning()
 
-    if (!updated) return apiError('2FA token set not found', 404)
+    if (!updated)
+      return apiError(
+        '2FA token set not found',
+        404,
+        ErrorCode.TWO_FACTOR_NOT_FOUND
+      )
 
     const { encryptedTokens: _et, ...safeRow } = updated
     return NextResponse.json({ data: safeRow })
@@ -68,7 +75,12 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
       )
       .returning()
 
-    if (!deleted) return apiError('2FA token set not found', 404)
+    if (!deleted)
+      return apiError(
+        '2FA token set not found',
+        404,
+        ErrorCode.TWO_FACTOR_NOT_FOUND
+      )
 
     return NextResponse.json({ data: { id } })
   })

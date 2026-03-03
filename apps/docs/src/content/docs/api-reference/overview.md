@@ -55,26 +55,29 @@ Content-Type: application/json
 
 ## Error format
 
-All errors return a JSON object with an `error` string:
+All errors return a JSON object with a human-readable `error` message and a machine-readable `code`:
 
 ```json
 {
-  "error": "Not found"
+  "error": "Category not found",
+  "code": "CATEGORY_NOT_FOUND"
 }
 ```
 
+Use `error` to display messages to users. Use `code` for programmatic handling — see the full [Error Codes reference](/api-reference/errors/).
+
 ### Common status codes
 
-| Status | Meaning |
-|--------|---------|
-| 200 | Success |
-| 201 | Created |
-| 204 | No content (successful delete) |
-| 400 | Bad request — see `error` for details |
-| 401 | Unauthorized — missing or invalid credentials |
-| 403 | Forbidden — valid credentials but insufficient scope |
-| 404 | Resource not found (or not owned by you) |
-| 500 | Internal server error |
+| Status | Meaning                                              |
+| ------ | ---------------------------------------------------- |
+| 200    | Success                                              |
+| 201    | Created                                              |
+| 204    | No content (successful delete)                       |
+| 400    | Bad request — see `error` for details                |
+| 401    | Unauthorized — missing or invalid credentials        |
+| 403    | Forbidden — valid credentials but insufficient scope |
+| 404    | Resource not found (or not owned by you)             |
+| 500    | Internal server error                                |
 
 ## Pagination
 
