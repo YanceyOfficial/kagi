@@ -28,6 +28,18 @@ export function useEntries(categoryId?: string, search?: string) {
   })
 }
 
+export function useProjectNames() {
+  return useQuery({
+    queryKey: ['entries', 'project-names'],
+    queryFn: async () => {
+      const res = await fetch('/api/entries/project-names')
+      if (!res.ok) throw new Error('Failed to fetch project names')
+      const json: ApiSuccess<string[]> = await res.json()
+      return json.data
+    }
+  })
+}
+
 export function useRevealEntry() {
   return useMutation({
     mutationFn: async (id: string): Promise<RevealedKeyValue> => {

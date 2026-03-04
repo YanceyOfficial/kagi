@@ -20,6 +20,8 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import {
   useCreateEntry,
+  useEntries,
+  useProjectNames,
   useUpdateEntry,
   useUploadFile
 } from '@/lib/hooks/use-entries'
@@ -31,8 +33,142 @@ import type {
   KeyEntryWithCategory
 } from '@/types'
 import { useForm } from '@tanstack/react-form'
-import { Loader2, Upload } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { Check, Loader2, Plus, Upload } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+
+// ─── Project Name Combobox ────────────────────────────────────────────────────
+
+interface ProjectNameComboboxProps {
+  value: string
+  onChange: (value: string) => void
+  suggestions: string[]
+  occupiedNames: string[]
+  error?: string
+}
+
+function ProjectNameCombobox({
+  value,
+  onChange,
+  suggestions,
+  occupiedNames,
+  error
+}: ProjectNameComboboxProps) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const trimmed = value.trim()
+  const filtered = suggestions.filter((n) =>
+    !trimmed || n.toLowerCase().includes(trimmed.toLowerCase())
+  )
+  const isNew =
+    trimmed.length > 0 &&
+    !suggestions.some((n) => n.toLowerCase() === trimmed.toLowerCase())
+
+  useEffect(() => {
+    if (!open) return
+    function handleMouseDown(e: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [open])
+
+  function select(name: string) {
+    onChange(name)
+    setOpen(false)
+  }
+
+  return (
+    <div ref={containerRef} className="relative">
+      <Input
+        placeholder="e.g. Blog, Main App, Personal"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value)
+          setOpen(true)
+        }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') setOpen(false)
+          if (e.key === 'Enter') e.preventDefault()
+        }}
+        className={cn(
+          'font-mono text-sm',
+          error && 'border-destructive focus-visible:ring-destructive'
+        )}
+        autoComplete="off"
+      />
+
+      {open && (filtered.length > 0 || isNew) && (
+        <div className="bg-popover border-border absolute top-full left-0 z-50 mt-1 w-full overflow-hidden rounded-md border shadow-md">
+          {filtered.length > 0 && (
+            <div className="border-border border-b px-2 py-1">
+              <p className="text-muted-foreground font-mono text-[10px] tracking-wider uppercase">
+                Existing projects
+              </p>
+            </div>
+          )}
+          <div className="max-h-40 overflow-y-auto">
+            {filtered.map((name) => {
+              const taken = occupiedNames.some(
+                (n) => n.toLowerCase() === name.toLowerCase()
+              )
+              return (
+                <button
+                  key={name}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => !taken && select(name)}
+                  disabled={taken}
+                  className={cn(
+                    'flex w-full items-center gap-2 px-3 py-2 text-left font-mono text-sm',
+                    taken
+                      ? 'text-muted-foreground cursor-not-allowed opacity-60'
+                      : 'hover:bg-accent hover:text-accent-foreground'
+                  )}
+                >
+                  <Check
+                    className={cn(
+                      'size-3 shrink-0',
+                      name.toLowerCase() === trimmed.toLowerCase()
+                        ? 'opacity-100'
+                        : 'opacity-0'
+                    )}
+                  />
+                  {name}
+                  {taken && (
+                    <span className="text-destructive ml-auto font-mono text-[10px]">
+                      taken
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+
+            {isNew && (
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => select(trimmed)}
+                className="text-primary hover:bg-accent flex w-full items-center gap-2 px-3 py-2 text-left font-mono text-sm"
+              >
+                <Plus className="size-3 shrink-0" />
+                Create &ldquo;{trimmed}&rdquo;
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {error && <p className="text-destructive mt-1 text-xs">{error}</p>}
+    </div>
+  )
+}
 
 const ENVIRONMENTS: Environment[] = [
   'production',
@@ -57,6 +193,12 @@ export function CreateEntryDialog({
   const createMutation = useCreateEntry()
   const updateMutation = useUpdateEntry()
   const uploadMutation = useUploadFile()
+  const { data: projectNames = [] } = useProjectNames()
+  const { data: categoryEntries = [] } = useEntries(category.id)
+  // Project names already taken in this specific category (exclude self when editing)
+  const occupiedNames = categoryEntries
+    .filter((e) => e.id !== editTarget?.id)
+    .map((e) => e.projectName)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [dragActive, setDragActive] = useState(false)
   const [groupValues, setGroupValues] = useState<Record<string, string>>(
@@ -161,24 +303,32 @@ export function CreateEntryDialog({
           <form.Field
             name="projectName"
             validators={{
-              onChange: ({ value }) =>
-                !value.trim() ? 'Project name is required' : undefined
+              onChange: ({ value }) => {
+                if (!value.trim()) return 'Project name is required'
+                if (
+                  occupiedNames.some(
+                    (n) => n.toLowerCase() === value.trim().toLowerCase()
+                  )
+                )
+                  return `"${value.trim()}" is already used in this category`
+                return undefined
+              }
             }}
           >
             {(field) => (
               <div className="space-y-1">
                 <Label className="text-xs">Project Name *</Label>
-                <Input
-                  placeholder="e.g. Blog, Main App, Personal"
+                <ProjectNameCombobox
                   value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className="font-mono text-sm"
+                  onChange={(v) => field.handleChange(v)}
+                  suggestions={projectNames}
+                  occupiedNames={occupiedNames}
+                  error={
+                    field.state.meta.errors.length > 0
+                      ? String(field.state.meta.errors[0])
+                      : undefined
+                  }
                 />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-destructive text-xs">
-                    {field.state.meta.errors[0]}
-                  </p>
-                )}
               </div>
             )}
           </form.Field>
