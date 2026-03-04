@@ -57,8 +57,8 @@ function ProjectNameCombobox({
   const containerRef = useRef<HTMLDivElement>(null)
 
   const trimmed = value.trim()
-  const filtered = suggestions.filter((n) =>
-    !trimmed || n.toLowerCase().includes(trimmed.toLowerCase())
+  const filtered = suggestions.filter(
+    (n) => !trimmed || n.toLowerCase().includes(trimmed.toLowerCase())
   )
   const isNew =
     trimmed.length > 0 &&
