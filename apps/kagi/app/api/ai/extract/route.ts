@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
         id: keyEntries.id,
         categoryId: keyEntries.categoryId,
         projectName: keyEntries.projectName,
-        environment: keyEntries.environment
+        environment: keyEntries.environment,
+        description: keyEntries.description,
+        notes: keyEntries.notes
       })
       .from(keyEntries)
       .innerJoin(keyCategories, eq(keyEntries.categoryId, keyCategories.id))
@@ -57,6 +59,7 @@ export async function POST(request: NextRequest) {
     const keyContext = allCategories.map((cat) => ({
       categoryId: cat.id,
       categoryName: cat.name,
+      ...(cat.description && { categoryDescription: cat.description }),
       keyType: cat.keyType,
       envVarName: cat.envVarName,
       fieldDefinitions: cat.fieldDefinitions,
@@ -65,7 +68,9 @@ export async function POST(request: NextRequest) {
         .map((e) => ({
           entryId: e.id,
           projectName: e.projectName,
-          environment: e.environment
+          environment: e.environment,
+          ...(e.description && { description: e.description }),
+          ...(e.notes && { notes: e.notes })
         }))
     }))
 

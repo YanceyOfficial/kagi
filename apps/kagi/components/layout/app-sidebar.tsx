@@ -24,7 +24,6 @@ import {
 import { signOut } from '@/lib/auth/client'
 import { cn } from '@/lib/utils'
 import {
-  Bot,
   ChevronDown,
   FolderDot,
   KeyRound,
@@ -52,11 +51,6 @@ const navItems = [
     title: '2FA Recovery',
     href: '/2fa',
     icon: ShieldCheck
-  },
-  {
-    title: 'AI Extract',
-    href: '/ai-extract',
-    icon: Bot
   },
   {
     title: 'Env Manager',

@@ -7,9 +7,10 @@ import {
   useSaveEnvFile
 } from '@/lib/hooks/use-envs'
 import type { EnvFile, EnvFileType } from '@/types'
-import { Copy, Download, Eye, Loader2, Save, Trash2 } from 'lucide-react'
+import { Bot, Copy, Download, Eye, Loader2, Save, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { sileo } from 'sileo'
+import { AiFillPanel } from './ai-fill-panel'
 import { EnvFileEditor } from './env-file-editor'
 import { SecretGenerator } from './secret-generator'
 
@@ -26,10 +27,14 @@ export function EnvFileTab({
 }: EnvFileTabProps) {
   const [revealedContent, setRevealedContent] = useState<string | null>(null)
   const [editContent, setEditContent] = useState<string>('')
+  const [aiOpen, setAiOpen] = useState(false)
+  const [forceEditorOpen, setForceEditorOpen] = useState(false)
 
   const revealMutation = useRevealEnvFile()
   const saveMutation = useSaveEnvFile()
   const deleteMutation = useDeleteEnvFile()
+
+  const showEditor = !existingFile || revealedContent !== null || forceEditorOpen
 
   async function handleReveal() {
     if (!existingFile) return
@@ -52,6 +57,7 @@ export function EnvFileTab({
       content: editContent
     })
     setRevealedContent(editContent)
+    setForceEditorOpen(false)
   }
 
   async function handleDelete() {
@@ -62,6 +68,7 @@ export function EnvFileTab({
     })
     setRevealedContent(null)
     setEditContent('')
+    setForceEditorOpen(false)
   }
 
   function handleCopy() {
@@ -83,7 +90,11 @@ export function EnvFileTab({
     URL.revokeObjectURL(url)
   }
 
-  const showEditor = !existingFile || revealedContent !== null
+  function handleAiApply(content: string) {
+    setEditContent(content)
+    setForceEditorOpen(true)
+    setAiOpen(false)
+  }
 
   return (
     <div className="space-y-3">
@@ -105,7 +116,7 @@ export function EnvFileTab({
           </Button>
         )}
 
-        {existingFile && revealedContent === null && (
+        {existingFile && !showEditor && (
           <Button
             size="sm"
             variant="outline"
@@ -122,7 +133,7 @@ export function EnvFileTab({
           </Button>
         )}
 
-        {(revealedContent !== null || !existingFile) && editContent && (
+        {showEditor && editContent && (
           <>
             <Button
               size="sm"
@@ -155,6 +166,16 @@ export function EnvFileTab({
           />
         )}
 
+        <Button
+          size="sm"
+          variant={aiOpen ? 'default' : 'outline'}
+          onClick={() => setAiOpen((v) => !v)}
+          className="font-mono text-xs"
+        >
+          <Bot className="mr-1.5 size-3" />
+          AI Generate
+        </Button>
+
         {existingFile && revealedContent !== null && (
           <Button
             size="sm"
@@ -172,6 +193,11 @@ export function EnvFileTab({
           </Button>
         )}
       </div>
+
+      {/* AI panel */}
+      {aiOpen && (
+        <AiFillPanel onApply={handleAiApply} onClose={() => setAiOpen(false)} />
+      )}
 
       {/* Editor or placeholder */}
       {showEditor ? (

@@ -444,7 +444,7 @@ export function CreateEntryDialog({
                     placeholder="Or paste the file content directly..."
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="mt-2 h-24 resize-none font-mono text-xs"
+                    className="mt-2 h-24 resize-none break-all font-mono text-xs"
                   />
                 )}
               </form.Field>
@@ -474,7 +474,7 @@ export function CreateEntryDialog({
                     }
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    className="h-20 resize-none font-mono text-xs"
+                    className="h-20 resize-none break-all font-mono text-xs"
                   />
                   {field.state.meta.errors.length > 0 && (
                     <p className="text-destructive text-xs">

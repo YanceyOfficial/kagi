@@ -130,58 +130,6 @@ test.describe('2FA Recovery page', () => {
   })
 })
 
-// ── AI Extract page ───────────────────────────────────────────────────────────
-
-test.describe('AI Extract page', () => {
-  test.beforeEach(async ({ page }) => {
-    await setupAuthMocks(page)
-    await page.goto('/ai-extract')
-    test.skip(
-      new URL(page.url()).pathname === '/login',
-      'Server-side auth redirect — skipped (requires running Keycloak)'
-    )
-  })
-
-  test('renders AI Key Extractor heading', async ({ page }) => {
-    await expect(
-      page.getByRole('heading', { name: /ai key extractor/i })
-    ).toBeVisible()
-  })
-
-  test('privacy note is visible', async ({ page }) => {
-    await expect(page.getByText(/privacy-first/i)).toBeVisible()
-  })
-
-  test('prompt textarea is present', async ({ page }) => {
-    await expect(page.getByRole('textbox')).toBeVisible()
-  })
-
-  test('"Extract Keys" button starts disabled when prompt is empty', async ({
-    page
-  }) => {
-    const btn = page.getByRole('button', { name: /extract keys/i })
-    await expect(btn).toBeDisabled()
-  })
-
-  test('"Extract Keys" button enables when prompt is typed', async ({
-    page
-  }) => {
-    await page.getByRole('textbox').fill('Get my OpenAI key')
-    const btn = page.getByRole('button', { name: /extract keys/i })
-    await expect(btn).toBeEnabled()
-  })
-
-  test('example prompt buttons populate the textarea', async ({ page }) => {
-    const exampleBtn = page
-      .getByRole('button', { name: /extract the openai key/i })
-      .first()
-    await exampleBtn.click()
-    const textarea = page.getByRole('textbox')
-    const value = await textarea.inputValue()
-    expect(value.length).toBeGreaterThan(10)
-  })
-})
-
 // ── Settings page ─────────────────────────────────────────────────────────────
 
 test.describe('Settings page', () => {

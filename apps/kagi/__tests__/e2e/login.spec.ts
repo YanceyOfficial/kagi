@@ -67,7 +67,7 @@ test.describe('Login page', () => {
 })
 
 test.describe('Unauthenticated redirects', () => {
-  const PROTECTED_PAGES = ['/', '/keys', '/settings', '/ai-extract', '/2fa']
+  const PROTECTED_PAGES = ['/', '/keys', '/settings', '/2fa', '/envs']
 
   for (const path of PROTECTED_PAGES) {
     test(`${path} redirects to /login`, async ({ page }) => {
