@@ -56,7 +56,8 @@ type FormValues = {
 
 const KEY_TYPE_DESCRIPTIONS: Record<KeyType, string> = {
   simple: 'A single environment variable value (e.g. OPENAI_API_KEY)',
-  group: 'Multiple related env vars (e.g. AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)'
+  group:
+    'Multiple related env vars (e.g. AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)'
 }
 
 interface CreateCategoryDialogProps {
@@ -222,16 +223,14 @@ export function CreateCategoryDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="font-mono">
-                    {(['simple', 'group'] as KeyType[]).map(
-                      (t) => (
-                        <SelectItem key={t} value={t} className="text-xs">
-                          <span className="font-medium">{t}</span> —{' '}
-                          <span className="text-muted-foreground">
-                            {KEY_TYPE_DESCRIPTIONS[t]}
-                          </span>
-                        </SelectItem>
-                      )
-                    )}
+                    {(['simple', 'group'] as KeyType[]).map((t) => (
+                      <SelectItem key={t} value={t} className="text-xs">
+                        <span className="font-medium">{t}</span> —{' '}
+                        <span className="text-muted-foreground">
+                          {KEY_TYPE_DESCRIPTIONS[t]}
+                        </span>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -275,7 +274,9 @@ export function CreateCategoryDialog({
                           <Input
                             placeholder="Add field name, e.g. AWS_REGION"
                             value={newField}
-                            onChange={(e) => setNewField(e.target.value.toUpperCase())}
+                            onChange={(e) =>
+                              setNewField(e.target.value.toUpperCase())
+                            }
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault()

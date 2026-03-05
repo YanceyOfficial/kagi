@@ -34,7 +34,8 @@ export function EnvFileTab({
   const saveMutation = useSaveEnvFile()
   const deleteMutation = useDeleteEnvFile()
 
-  const showEditor = !existingFile || revealedContent !== null || forceEditorOpen
+  const showEditor =
+    !existingFile || revealedContent !== null || forceEditorOpen
 
   async function handleReveal() {
     if (!existingFile) return

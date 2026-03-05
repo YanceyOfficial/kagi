@@ -12,12 +12,8 @@ export const authProviders = {
     process.env.KEYCLOAK_CLIENT_ID &&
     process.env.KEYCLOAK_CLIENT_SECRET
   ),
-  google: !!(
-    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-  ),
-  github: !!(
-    process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
-  ),
+  google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+  github: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
   emailPassword: process.env.ENABLE_EMAIL_PASSWORD === 'true'
 } as const
 
@@ -25,7 +21,10 @@ export type AuthProviders = typeof authProviders
 
 // ── Social providers (Google, GitHub) ────────────────────────────────────────
 
-const socialProviders: Record<string, { clientId: string; clientSecret: string }> = {}
+const socialProviders: Record<
+  string,
+  { clientId: string; clientSecret: string }
+> = {}
 
 if (authProviders.google) {
   socialProviders.google = {

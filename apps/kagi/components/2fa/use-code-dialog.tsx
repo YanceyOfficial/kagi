@@ -53,12 +53,16 @@ export function UseCodeDialog({
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 font-mono text-base">
-                <ShieldAlert className="text-amber-400 size-4 shrink-0" />
+                <ShieldAlert className="size-4 shrink-0 text-amber-400" />
                 Use a recovery code?
               </DialogTitle>
               <DialogDescription className="font-mono text-xs">
-                A code from <span className="text-foreground font-semibold">{token.service}</span> will
-                be permanently removed from your vault. This cannot be undone.
+                A code from{' '}
+                <span className="text-foreground font-semibold">
+                  {token.service}
+                </span>{' '}
+                will be permanently removed from your vault. This cannot be
+                undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2">
@@ -96,7 +100,7 @@ export function UseCodeDialog({
             </DialogHeader>
 
             <div className="bg-muted/30 border-primary/20 flex items-center justify-between rounded border px-4 py-3">
-              <span className="text-primary select-all font-mono text-lg font-bold tracking-widest">
+              <span className="text-primary font-mono text-lg font-bold tracking-widest select-all">
                 {revealedCode}
               </span>
               <Button

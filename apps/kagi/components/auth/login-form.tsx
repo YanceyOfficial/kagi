@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { signIn } from '@/lib/auth/client'
 import type { AuthProviders } from '@/lib/auth'
+import { signIn } from '@/lib/auth/client'
 import { Github, KeyRound, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { sileo } from 'sileo'
@@ -27,7 +27,10 @@ export function LoginForm({ providers }: LoginFormProps) {
 
   const hasOAuth = providers.keycloak || providers.google || providers.github
   const noProviders =
-    !providers.emailPassword && !providers.keycloak && !providers.google && !providers.github
+    !providers.emailPassword &&
+    !providers.keycloak &&
+    !providers.google &&
+    !providers.github
 
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -169,7 +172,9 @@ export function LoginForm({ providers }: LoginFormProps) {
               ) : (
                 <KeyRound className="mr-2 size-4" />
               )}
-              {loading === 'keycloak' ? 'Redirecting...' : 'Sign in with Keycloak'}
+              {loading === 'keycloak'
+                ? 'Redirecting...'
+                : 'Sign in with Keycloak'}
             </Button>
           )}
 

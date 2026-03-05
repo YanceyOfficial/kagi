@@ -80,7 +80,9 @@ export function TwoFaCard({ token, onDelete }: TwoFaCardProps) {
                     : 'border-emerald-700/50 text-emerald-400'
               )}
             >
-              {isDepleted ? 'Depleted' : `${remaining} / ${token.totalCount} remaining`}
+              {isDepleted
+                ? 'Depleted'
+                : `${remaining} / ${token.totalCount} remaining`}
             </Badge>
             <span className="text-muted-foreground ml-auto font-mono text-xs">
               {formatDistanceToNow(new Date(token.createdAt), {
@@ -90,7 +92,7 @@ export function TwoFaCard({ token, onDelete }: TwoFaCardProps) {
           </div>
 
           {isDepleted ? (
-            <div className="flex items-center gap-2 rounded border border-dashed border-destructive/30 px-3 py-2">
+            <div className="border-destructive/30 flex items-center gap-2 rounded border border-dashed px-3 py-2">
               <ShieldOff className="text-destructive/60 size-3.5 shrink-0" />
               <p className="text-muted-foreground font-mono text-xs">
                 All codes have been used

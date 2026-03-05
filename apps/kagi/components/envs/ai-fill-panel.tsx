@@ -121,38 +121,40 @@ export function AiFillPanel({ onApply, onClose }: AiFillPanelProps) {
           </div>
         </form>
 
-        {result && !extractMutation.isPending && result.selectedKeys.length > 0 && (
-          <div className="space-y-2 border-t pt-3">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs font-medium">
-                {result.selectedKeys.length} key(s) selected
-              </span>
-              <Button
-                size="sm"
-                onClick={() => onApply(result.envContent)}
-                className="glow-green font-mono text-xs"
-              >
-                <Wand2 className="mr-1.5 size-3" />
-                Apply to editor
-              </Button>
+        {result &&
+          !extractMutation.isPending &&
+          result.selectedKeys.length > 0 && (
+            <div className="space-y-2 border-t pt-3">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-medium">
+                  {result.selectedKeys.length} key(s) selected
+                </span>
+                <Button
+                  size="sm"
+                  onClick={() => onApply(result.envContent)}
+                  className="glow-green font-mono text-xs"
+                >
+                  <Wand2 className="mr-1.5 size-3" />
+                  Apply to editor
+                </Button>
+              </div>
+              <ul className="space-y-1">
+                {result.selectedKeys.map((key: AiSelectedKey) => (
+                  <li key={key.entryId} className="flex items-start gap-2">
+                    <Badge
+                      variant="outline"
+                      className="border-primary/30 text-primary mt-0.5 shrink-0 font-mono text-xs"
+                    >
+                      {key.envVarName}
+                    </Badge>
+                    <span className="text-muted-foreground font-mono text-xs">
+                      {key.reason}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="space-y-1">
-              {result.selectedKeys.map((key: AiSelectedKey) => (
-                <li key={key.entryId} className="flex items-start gap-2">
-                  <Badge
-                    variant="outline"
-                    className="border-primary/30 text-primary mt-0.5 shrink-0 font-mono text-xs"
-                  >
-                    {key.envVarName}
-                  </Badge>
-                  <span className="text-muted-foreground font-mono text-xs">
-                    {key.reason}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+          )}
       </CardContent>
     </Card>
   )

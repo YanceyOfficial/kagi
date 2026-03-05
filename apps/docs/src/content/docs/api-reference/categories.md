@@ -75,13 +75,13 @@ Content-Type: application/json
 
 ### Request body
 
-| Field         | Type                                   | Required         | Description                         |
-| ------------- | -------------------------------------- | ---------------- | ----------------------------------- |
-| `name`        | string                                 | yes              | Display name (e.g. "OpenAI API")    |
-| `keyType`     | `simple` \| `group`                    | yes              | Key type                            |
-| `envVarName`  | string                                 | yes for `simple` | Environment variable name           |
-| `icon`        | string                                 | no               | Simple Icons slug (e.g. `"openai"`) |
-| `description` | string                                 | no               | Optional description                |
+| Field         | Type                | Required         | Description                         |
+| ------------- | ------------------- | ---------------- | ----------------------------------- |
+| `name`        | string              | yes              | Display name (e.g. "OpenAI API")    |
+| `keyType`     | `simple` \| `group` | yes              | Key type                            |
+| `envVarName`  | string              | yes for `simple` | Environment variable name           |
+| `icon`        | string              | no               | Simple Icons slug (e.g. `"openai"`) |
+| `description` | string              | no               | Optional description                |
 
 ```json
 {
