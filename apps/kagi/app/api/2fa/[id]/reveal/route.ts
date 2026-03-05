@@ -1,7 +1,7 @@
 import { apiError, requireSession, withAuth } from '@/lib/api-helpers'
 import { db } from '@/lib/db'
 import { twoFactorTokens } from '@/lib/db/schema'
-import { decryptJson } from '@/lib/encryption'
+import { decryptJson, encryptJson } from '@/lib/encryption'
 import { ErrorCode } from '@/lib/error-codes'
 import { and, eq } from 'drizzle-orm'
 import { NextRequest, NextResponse } from 'next/server'
@@ -32,11 +32,26 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
 
     const tokens = decryptJson<string[]>(row.encryptedTokens)
 
+    if (tokens.length === 0)
+      return apiError('No codes remaining', 400, ErrorCode.VALIDATION_ERROR)
+
+    const [token, ...remaining] = tokens
+
+    await db
+      .update(twoFactorTokens)
+      .set({
+        encryptedTokens: encryptJson(remaining),
+        usedCount: row.usedCount + 1,
+        updatedAt: new Date()
+      })
+      .where(eq(twoFactorTokens.id, id))
+
     return NextResponse.json({
       data: {
         id: row.id,
         service: row.service,
-        tokens
+        token,
+        remaining: remaining.length
       }
     })
   })

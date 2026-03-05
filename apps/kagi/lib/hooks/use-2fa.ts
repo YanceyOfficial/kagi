@@ -2,7 +2,7 @@ import { ApiError, throwIfError } from '@/lib/api-client'
 import type {
   ApiSuccess,
   CreateTwoFactorTokenInput,
-  RevealedTwoFactorTokens,
+  RevealedTwoFactorCode,
   TwoFactorToken
 } from '@/types'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -27,13 +27,15 @@ export function useTwoFactorTokens(search?: string) {
 }
 
 export function useRevealTwoFactor() {
+  const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (id: string): Promise<RevealedTwoFactorTokens> => {
+    mutationFn: async (id: string): Promise<RevealedTwoFactorCode> => {
       const res = await fetch(`/api/2fa/${id}/reveal`, { method: 'POST' })
-      if (!res.ok) await throwIfError(res, 'Failed to reveal tokens')
-      const json: ApiSuccess<RevealedTwoFactorTokens> = await res.json()
+      if (!res.ok) await throwIfError(res, 'Failed to reveal code')
+      const json: ApiSuccess<RevealedTwoFactorCode> = await res.json()
       return json.data
     },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['2fa'] }),
     onError: (err: ApiError) =>
       sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })

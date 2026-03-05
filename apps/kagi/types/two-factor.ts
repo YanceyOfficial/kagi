@@ -17,8 +17,9 @@ export interface CreateTwoFactorTokenInput {
   tokens: string[]
 }
 
-export interface RevealedTwoFactorTokens {
+export interface RevealedTwoFactorCode {
   id: string
   service: string
-  tokens: string[]
+  token: string
+  remaining: number
 }
