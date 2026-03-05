@@ -251,9 +251,9 @@ export function CreateCategoryDialog({
                         value={field.state.value}
                         onChange={(e) => {
                           userEditedEnvVar.current = true
-                          field.handleChange(e.target.value)
+                          field.handleChange(e.target.value.toUpperCase())
                         }}
-                        className="font-mono text-sm uppercase"
+                        className="font-mono text-sm"
                       />
                       <p className="text-muted-foreground text-xs">
                         The environment variable name for .env file generation
@@ -275,11 +275,11 @@ export function CreateCategoryDialog({
                           <Input
                             placeholder="Add field name, e.g. AWS_REGION"
                             value={newField}
-                            onChange={(e) => setNewField(e.target.value)}
+                            onChange={(e) => setNewField(e.target.value.toUpperCase())}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault()
-                                const t = newField.trim().toUpperCase()
+                                const t = newField.trim()
                                 if (t && !defs.includes(t)) {
                                   field.handleChange([...defs, t])
                                   setNewField('')
@@ -293,7 +293,7 @@ export function CreateCategoryDialog({
                             variant="outline"
                             size="icon"
                             onClick={() => {
-                              const t = newField.trim().toUpperCase()
+                              const t = newField.trim()
                               if (t && !defs.includes(t)) {
                                 field.handleChange([...defs, t])
                                 setNewField('')

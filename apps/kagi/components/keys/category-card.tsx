@@ -90,13 +90,34 @@ export function CategoryCard({
               {category.entryCount === 1 ? 'entry' : 'entries'}
             </Badge>
           )}
-          {category.envVarName && (
+          {category.keyType === 'simple' && category.envVarName && (
             <Badge
               variant="outline"
               className="border-muted text-muted-foreground h-5 font-mono text-xs"
             >
               {category.envVarName}
             </Badge>
+          )}
+          {category.keyType === 'group' && category.fieldDefinitions && (
+            <>
+              {category.fieldDefinitions.slice(0, 3).map((f) => (
+                <Badge
+                  key={f}
+                  variant="outline"
+                  className="border-muted text-muted-foreground h-5 font-mono text-xs"
+                >
+                  {f}
+                </Badge>
+              ))}
+              {category.fieldDefinitions.length > 3 && (
+                <Badge
+                  variant="outline"
+                  className="border-muted text-muted-foreground h-5 font-mono text-xs"
+                >
+                  +{category.fieldDefinitions.length - 3}
+                </Badge>
+              )}
+            </>
           )}
         </div>
       </CardContent>
