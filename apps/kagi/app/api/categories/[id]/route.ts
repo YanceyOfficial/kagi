@@ -16,7 +16,7 @@ const updateSchema = z.object({
     .regex(/^#[0-9a-fA-F]{6}$/)
     .optional()
     .nullable(),
-  keyType: z.enum(['simple', 'group', 'ssh', 'json']).optional(),
+  keyType: z.enum(['simple', 'group']).optional(),
   envVarName: z.string().max(255).optional().nullable(),
   fieldDefinitions: z.array(z.string().min(1)).optional().nullable()
 })

@@ -15,7 +15,7 @@ const createSchema = z.object({
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
     .optional(),
-  keyType: z.enum(['simple', 'group', 'ssh', 'json']),
+  keyType: z.enum(['simple', 'group']),
   envVarName: z.string().max(255).optional(),
   fieldDefinitions: z.array(z.string().min(1)).optional()
 })

@@ -22,8 +22,7 @@ import {
   useCreateEntry,
   useEntries,
   useProjectNames,
-  useUpdateEntry,
-  useUploadFile
+  useUpdateEntry
 } from '@/lib/hooks/use-entries'
 import { cn } from '@/lib/utils'
 import type {
@@ -33,7 +32,7 @@ import type {
   KeyEntryWithCategory
 } from '@/types'
 import { useForm } from '@tanstack/react-form'
-import { Check, Loader2, Plus, Upload } from 'lucide-react'
+import { Check, Loader2, Plus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 // ─── Project Name Combobox ────────────────────────────────────────────────────
@@ -192,15 +191,12 @@ export function CreateEntryDialog({
 }: CreateEntryDialogProps) {
   const createMutation = useCreateEntry()
   const updateMutation = useUpdateEntry()
-  const uploadMutation = useUploadFile()
   const { data: projectNames = [] } = useProjectNames()
   const { data: categoryEntries = [] } = useEntries(category.id)
   // Project names already taken in this specific category (exclude self when editing)
   const occupiedNames = categoryEntries
     .filter((e) => e.id !== editTarget?.id)
     .map((e) => e.projectName)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [dragActive, setDragActive] = useState(false)
   const [groupValues, setGroupValues] = useState<Record<string, string>>(
     editTarget
       ? {}
@@ -211,7 +207,6 @@ export function CreateEntryDialog({
   )
 
   const isEditing = !!editTarget
-  const isFile = category.keyType === 'ssh' || category.keyType === 'json'
   const isGroup = category.keyType === 'group'
   const isPending = createMutation.isPending || updateMutation.isPending
 
@@ -257,28 +252,6 @@ export function CreateEntryDialog({
       onOpenChange(false)
     }
   })
-
-  async function handleFileDrop(file: File) {
-    const result = await uploadMutation.mutateAsync(file)
-    form.setFieldValue('value', result.content)
-    form.setFieldValue('fileName', result.fileName)
-  }
-
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault()
-    setDragActive(true)
-  }
-
-  function handleDragLeave() {
-    setDragActive(false)
-  }
-
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault()
-    setDragActive(false)
-    const file = e.dataTransfer.files[0]
-    if (file) handleFileDrop(file)
-  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -385,69 +358,6 @@ export function CreateEntryDialog({
                   </div>
                 ))}
               </div>
-            </div>
-          ) : isFile ? (
-            <div className="space-y-1">
-              <Label className="text-xs">
-                {category.keyType === 'ssh'
-                  ? 'SSH Private Key File'
-                  : 'JSON Credential File'}
-              </Label>
-              <div
-                className={cn(
-                  'cursor-pointer rounded border-2 border-dashed p-6 text-center transition-colors',
-                  dragActive
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/40'
-                )}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  accept={
-                    category.keyType === 'json' ? '.json,application/json' : '*'
-                  }
-                  onChange={(e) => {
-                    const f = e.target.files?.[0]
-                    if (f) handleFileDrop(f)
-                  }}
-                />
-                {uploadMutation.isPending ? (
-                  <Loader2 className="text-primary mx-auto size-8 animate-spin" />
-                ) : (
-                  <>
-                    <Upload className="text-muted-foreground mx-auto size-8" />
-                    <p className="text-muted-foreground mt-2 text-xs">
-                      Drag & drop or click to upload
-                    </p>
-                  </>
-                )}
-              </div>
-              <form.Subscribe selector={(s) => s.values.fileName}>
-                {(fileName) =>
-                  fileName ? (
-                    <p className="text-primary font-mono text-xs">
-                      ✓ {fileName} loaded
-                    </p>
-                  ) : null
-                }
-              </form.Subscribe>
-              {/* Also allow pasting raw content */}
-              <form.Field name="value">
-                {(field) => (
-                  <Textarea
-                    placeholder="Or paste the file content directly..."
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="mt-2 h-24 resize-none break-all font-mono text-xs"
-                  />
-                )}
-              </form.Field>
             </div>
           ) : (
             <form.Field

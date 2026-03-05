@@ -88,12 +88,10 @@ export function buildOpenApiSpec(baseUrl: string) {
         },
         KeyType: {
           type: 'string',
-          enum: ['simple', 'group', 'ssh', 'json'],
+          enum: ['simple', 'group'],
           description:
             '`simple` — single env var string\n' +
-            '`group` — multi-field key-value map\n' +
-            '`ssh` — SSH private key file content\n' +
-            '`json` — JSON credential file content'
+            '`group` — multi-field key-value map'
         },
         Environment: {
           type: 'string',
@@ -175,7 +173,7 @@ export function buildOpenApiSpec(baseUrl: string) {
               oneOf: [
                 {
                   type: 'string',
-                  description: 'Plaintext value for simple/ssh/json'
+                  description: 'Plaintext value for simple type'
                 },
                 {
                   type: 'object',
@@ -555,7 +553,7 @@ export function buildOpenApiSpec(baseUrl: string) {
                       oneOf: [
                         {
                           type: 'string',
-                          description: 'Plaintext for simple/ssh/json'
+                          description: 'Plaintext for simple type'
                         },
                         {
                           type: 'object',

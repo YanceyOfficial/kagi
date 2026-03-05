@@ -18,12 +18,10 @@ This lets you reuse the same category definition (with its env var name, icon, a
 
 ### Key types
 
-| Type     | Description                                     | Stored as              |
-| -------- | ----------------------------------------------- | ---------------------- |
-| `simple` | Single environment variable                     | Encrypted string       |
-| `group`  | Multi-field map (e.g. AWS keys)                 | Encrypted JSON object  |
-| `ssh`    | SSH private key file                            | Encrypted file content |
-| `json`   | JSON credential file (e.g. GCP service account) | Encrypted file content |
+| Type     | Description                     | Stored as             |
+| -------- | ------------------------------- | --------------------- |
+| `simple` | Single environment variable     | Encrypted string      |
+| `group`  | Multi-field map (e.g. AWS keys) | Encrypted JSON object |
 
 ### Encryption model
 

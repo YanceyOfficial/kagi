@@ -56,10 +56,7 @@ type FormValues = {
 
 const KEY_TYPE_DESCRIPTIONS: Record<KeyType, string> = {
   simple: 'A single environment variable value (e.g. OPENAI_API_KEY)',
-  group:
-    'Multiple related env vars (e.g. AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)',
-  ssh: 'An SSH private key file (.pem, id_rsa, etc.)',
-  json: 'A JSON credential file (e.g. Google service account)'
+  group: 'Multiple related env vars (e.g. AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)'
 }
 
 interface CreateCategoryDialogProps {
@@ -225,7 +222,7 @@ export function CreateCategoryDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="font-mono">
-                    {(['simple', 'group', 'ssh', 'json'] as KeyType[]).map(
+                    {(['simple', 'group'] as KeyType[]).map(
                       (t) => (
                         <SelectItem key={t} value={t} className="text-xs">
                           <span className="font-medium">{t}</span> —{' '}

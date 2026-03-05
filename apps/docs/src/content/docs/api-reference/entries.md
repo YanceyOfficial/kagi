@@ -37,8 +37,6 @@ Note: `encryptedValue` is **never** included in responses. Use the `/reveal` end
 | -------- | --------------------------------------- |
 | `simple` | Plain string (e.g., `"sk-abc123"`)      |
 | `group`  | JSON object of field name → value pairs |
-| `ssh`    | PEM-encoded private key string          |
-| `json`   | JSON credential object (stringified)    |
 
 ---
 

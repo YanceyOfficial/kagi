@@ -15,12 +15,7 @@ import {
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
-export const keyTypeEnum = pgEnum('key_type', [
-  'simple',
-  'group',
-  'ssh',
-  'json'
-])
+export const keyTypeEnum = pgEnum('key_type', ['simple', 'group'])
 
 export const environmentEnum = pgEnum('environment', [
   'production',

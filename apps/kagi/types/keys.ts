@@ -1,4 +1,4 @@
-export type KeyType = 'simple' | 'group' | 'ssh' | 'json'
+export type KeyType = 'simple' | 'group'
 export type Environment = 'production' | 'staging' | 'development' | 'local'
 
 // ─── Key Category (First Level) ───────────────────────────────────────────────
@@ -87,7 +87,6 @@ export interface RevealedKeyValue {
   keyType: KeyType
   // For 'simple': a plain string
   // For 'group': a key-value map
-  // For 'ssh' / 'json': file content as string
   value: string | Record<string, string>
   envVarName: string | null
   fieldDefinitions: string[] | null

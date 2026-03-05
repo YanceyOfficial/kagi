@@ -29,8 +29,6 @@ Categories define the _type_ and _format_ of a key (e.g. "OpenAI API", "AWS Cred
 | -------- | ---------------------------------------------------- |
 | `simple` | Single environment variable (string)                 |
 | `group`  | Multiple named fields (e.g. AWS access key + secret) |
-| `ssh`    | SSH private key file content                         |
-| `json`   | JSON credential file (e.g. GCP service account)      |
 
 ---
 
@@ -80,7 +78,7 @@ Content-Type: application/json
 | Field         | Type                                   | Required         | Description                         |
 | ------------- | -------------------------------------- | ---------------- | ----------------------------------- |
 | `name`        | string                                 | yes              | Display name (e.g. "OpenAI API")    |
-| `keyType`     | `simple` \| `group` \| `ssh` \| `json` | yes              | Key type                            |
+| `keyType`     | `simple` \| `group`                    | yes              | Key type                            |
 | `envVarName`  | string                                 | yes for `simple` | Environment variable name           |
 | `icon`        | string                                 | no               | Simple Icons slug (e.g. `"openai"`) |
 | `description` | string                                 | no               | Optional description                |
