@@ -16,6 +16,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 import type { KeyCategory } from '@/types'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
@@ -100,7 +106,7 @@ export function CategoryCard({
           )}
           {category.keyType === 'group' && category.fieldDefinitions && (
             <>
-              {category.fieldDefinitions.slice(0, 3).map((f) => (
+              {category.fieldDefinitions.slice(0, 2).map((f) => (
                 <Badge
                   key={f}
                   variant="outline"
@@ -109,13 +115,22 @@ export function CategoryCard({
                   {f}
                 </Badge>
               ))}
-              {category.fieldDefinitions.length > 3 && (
-                <Badge
-                  variant="outline"
-                  className="border-muted text-muted-foreground h-5 font-mono text-xs"
-                >
-                  +{category.fieldDefinitions.length - 3}
-                </Badge>
+              {category.fieldDefinitions.length > 2 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge
+                        variant="outline"
+                        className="border-muted text-muted-foreground h-5 cursor-default font-mono text-xs"
+                      >
+                        +{category.fieldDefinitions.length - 2}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="font-mono text-xs">
+                      {category.fieldDefinitions.slice(2).join(', ')}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </>
           )}
