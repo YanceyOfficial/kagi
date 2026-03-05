@@ -19,7 +19,8 @@ export default defineConfig({
           label: 'Getting Started',
           items: [
             { label: 'Introduction', slug: 'guides/introduction' },
-            { label: 'Quick Start', slug: 'guides/quickstart' }
+            { label: 'Quick Start', slug: 'guides/quickstart' },
+            { label: 'Keycloak Setup', slug: 'guides/keycloak' }
           ]
         },
         {

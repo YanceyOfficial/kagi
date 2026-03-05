@@ -4,6 +4,68 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { genericOAuth } from 'better-auth/plugins'
 
+// ── Provider availability flags (server-side only) ───────────────────────────
+
+export const authProviders = {
+  keycloak: !!(
+    process.env.KEYCLOAK_URL &&
+    process.env.KEYCLOAK_CLIENT_ID &&
+    process.env.KEYCLOAK_CLIENT_SECRET
+  ),
+  google: !!(
+    process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+  ),
+  github: !!(
+    process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+  ),
+  emailPassword: process.env.ENABLE_EMAIL_PASSWORD === 'true'
+} as const
+
+export type AuthProviders = typeof authProviders
+
+// ── Social providers (Google, GitHub) ────────────────────────────────────────
+
+const socialProviders: Record<string, { clientId: string; clientSecret: string }> = {}
+
+if (authProviders.google) {
+  socialProviders.google = {
+    clientId: process.env.GOOGLE_CLIENT_ID!,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+  }
+}
+
+if (authProviders.github) {
+  socialProviders.github = {
+    clientId: process.env.GITHUB_CLIENT_ID!,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET!
+  }
+}
+
+// ── Plugins (Keycloak via genericOAuth) ──────────────────────────────────────
+
+const plugins = []
+
+if (authProviders.keycloak) {
+  plugins.push(
+    genericOAuth({
+      config: [
+        {
+          providerId: 'keycloak',
+          clientId: process.env.KEYCLOAK_CLIENT_ID!,
+          clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
+          authorizationUrl: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/auth`,
+          tokenUrl: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
+          userInfoUrl: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
+          scopes: ['openid', 'profile', 'email'],
+          pkce: true
+        }
+      ]
+    })
+  )
+}
+
+// ── Auth config ───────────────────────────────────────────────────────────────
+
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET!,
   baseURL: process.env.BETTER_AUTH_URL ?? process.env.NEXT_PUBLIC_APP_URL,
@@ -18,25 +80,14 @@ export const auth = betterAuth({
     }
   }),
 
-  plugins: [
-    genericOAuth({
-      config: [
-        {
-          providerId: 'keycloak',
-          clientId: process.env.KEYCLOAK_CLIENT_ID!,
-          clientSecret: process.env.KEYCLOAK_CLIENT_SECRET!,
-          // Keycloak OIDC endpoints
-          authorizationUrl: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/auth`,
-          tokenUrl: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/token`,
-          userInfoUrl: `${process.env.KEYCLOAK_URL}/realms/${process.env.KEYCLOAK_REALM}/protocol/openid-connect/userinfo`,
-          scopes: ['openid', 'profile', 'email'],
-          pkce: true
-        }
-      ]
-    })
-  ],
+  emailAndPassword: {
+    enabled: authProviders.emailPassword,
+    autoSignIn: true
+  },
 
-  // Session configuration
+  socialProviders,
+  plugins,
+
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24 // Refresh session if older than 1 day
