@@ -149,11 +149,6 @@ export function buildOpenApiSpec(baseUrl: string) {
             projectName: { type: 'string', example: 'Blog Project' },
             description: { type: 'string', nullable: true },
             environment: { $ref: '#/components/schemas/Environment' },
-            fileName: {
-              type: 'string',
-              nullable: true,
-              description: 'Original filename for SSH/JSON entries'
-            },
             notes: { type: 'string', nullable: true },
             expiresAt: {
               type: 'string',
@@ -187,8 +182,7 @@ export function buildOpenApiSpec(baseUrl: string) {
               type: 'array',
               items: { type: 'string' },
               nullable: true
-            },
-            fileName: { type: 'string', nullable: true }
+            }
           }
         },
         TwoFactorToken: {
@@ -562,7 +556,6 @@ export function buildOpenApiSpec(baseUrl: string) {
                         }
                       ]
                     },
-                    fileName: { type: 'string', maxLength: 255 },
                     notes: { type: 'string', maxLength: 2000 },
                     expiresAt: { type: 'string', format: 'date-time' }
                   }
@@ -650,7 +643,6 @@ export function buildOpenApiSpec(baseUrl: string) {
                         }
                       ]
                     },
-                    fileName: { type: 'string', nullable: true },
                     notes: { type: 'string', nullable: true },
                     expiresAt: {
                       type: 'string',

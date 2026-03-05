@@ -119,12 +119,9 @@ export const keyEntries = pgTable('key_entries', {
   description: text('description'),
   environment: environmentEnum('environment').default('production').notNull(),
   // AES-256-GCM encrypted value, format: "iv:authTag:ciphertext" (all base64)
-  // - simple  → encrypted plain string
-  // - group   → encrypted JSON object { [field]: value }
-  // - ssh/json → encrypted file content
+  // - simple → encrypted plain string
+  // - group  → encrypted JSON object { [field]: value }
   encryptedValue: text('encrypted_value').notNull(),
-  // Original filename for SSH key or JSON credential files
-  fileName: varchar('file_name', { length: 255 }),
   notes: text('notes'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

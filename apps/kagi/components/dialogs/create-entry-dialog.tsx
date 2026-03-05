@@ -216,7 +216,6 @@ export function CreateEntryDialog({
       description: editTarget?.description ?? '',
       environment: (editTarget?.environment ?? 'production') as Environment,
       value: '',
-      fileName: editTarget?.fileName ?? '',
       notes: editTarget?.notes ?? '',
       expiresAt: editTarget?.expiresAt
         ? new Date(editTarget.expiresAt).toISOString().split('T')[0]
@@ -237,7 +236,6 @@ export function CreateEntryDialog({
         description: value.description || undefined,
         environment: value.environment,
         value: submitValue,
-        fileName: value.fileName || undefined,
         notes: value.notes || undefined,
         expiresAt: value.expiresAt
           ? new Date(value.expiresAt).toISOString()

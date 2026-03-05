@@ -44,7 +44,6 @@ export interface KeyEntry {
   description: string | null
   environment: Environment
   // encryptedValue is never sent to the client — only revealed on explicit request
-  fileName: string | null
   notes: string | null
   createdAt: string
   updatedAt: string
@@ -72,7 +71,6 @@ export interface CreateKeyEntryInput {
   environment?: Environment
   // The plaintext value (will be encrypted server-side)
   value: string | Record<string, string>
-  fileName?: string
   notes?: string
   expiresAt?: string
 }
@@ -90,5 +88,4 @@ export interface RevealedKeyValue {
   value: string | Record<string, string>
   envVarName: string | null
   fieldDefinitions: string[] | null
-  fileName: string | null
 }

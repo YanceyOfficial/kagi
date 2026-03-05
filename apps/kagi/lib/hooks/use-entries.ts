@@ -118,24 +118,3 @@ export function useDeleteEntry() {
   })
 }
 
-export function useUploadFile() {
-  return useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData()
-      formData.append('file', file)
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      })
-      if (!res.ok) await throwIfError(res, 'Upload failed')
-      const json: ApiSuccess<{
-        fileName: string
-        contentType: string
-        content: string
-      }> = await res.json()
-      return json.data
-    },
-    onError: (err: ApiError) =>
-      sileo.error({ title: err.message, description: `Code: ${err.code}` })
-  })
-}

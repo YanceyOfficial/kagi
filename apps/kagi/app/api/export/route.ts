@@ -30,7 +30,6 @@ export async function GET() {
         projectName: keyEntries.projectName,
         description: keyEntries.description,
         environment: keyEntries.environment,
-        fileName: keyEntries.fileName,
         notes: keyEntries.notes,
         expiresAt: keyEntries.expiresAt,
         createdAt: keyEntries.createdAt
@@ -65,15 +64,15 @@ export async function GET() {
         name: cat.name,
         description: cat.description,
         keyType: cat.keyType,
-        envVarName: cat.envVarName,
-        fieldDefinitions: cat.fieldDefinitions,
+        ...(cat.keyType === 'simple'
+          ? { envVarName: cat.envVarName }
+          : { fieldDefinitions: cat.fieldDefinitions }),
         iconSlug: cat.iconSlug,
         createdAt: cat.createdAt,
         entries: (entriesByCategory.get(cat.id) ?? []).map((e) => ({
           projectName: e.projectName,
           description: e.description,
           environment: e.environment,
-          fileName: e.fileName,
           notes: e.notes,
           expiresAt: e.expiresAt,
           createdAt: e.createdAt

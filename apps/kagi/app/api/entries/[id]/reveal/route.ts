@@ -43,8 +43,7 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
         keyType,
         value,
         envVarName: category.envVarName,
-        fieldDefinitions: category.fieldDefinitions,
-        fileName: entry.fileName
+        fieldDefinitions: category.fieldDefinitions
       }
     })
   })

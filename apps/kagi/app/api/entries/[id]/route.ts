@@ -14,7 +14,6 @@ const updateSchema = z.object({
     .enum(['production', 'staging', 'development', 'local'])
     .optional(),
   value: z.union([z.string(), z.record(z.string(), z.string())]).optional(),
-  fileName: z.string().max(255).optional().nullable(),
   notes: z.string().max(2000).optional().nullable(),
   expiresAt: z.string().datetime().optional().nullable()
 })

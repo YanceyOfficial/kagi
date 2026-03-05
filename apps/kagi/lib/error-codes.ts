@@ -45,14 +45,6 @@ export const ErrorCode = {
   /** The requested env file does not exist or is not owned by the caller. */
   ENV_FILE_NOT_FOUND: 'ENV_FILE_NOT_FOUND',
 
-  // ── File Upload ─────────────────────────────────────────────────────────────
-  /** The multipart form did not contain a `file` field. */
-  UPLOAD_NO_FILE: 'UPLOAD_NO_FILE',
-  /** Uploaded file exceeds the 1 MB size limit. */
-  UPLOAD_FILE_TOO_LARGE: 'UPLOAD_FILE_TOO_LARGE',
-  /** Uploaded file MIME type is not in the allow-list. */
-  UPLOAD_INVALID_TYPE: 'UPLOAD_INVALID_TYPE',
-
   // ── AI Extraction ───────────────────────────────────────────────────────────
   /** AI extraction request failed (model error or invalid prompt). */
   AI_EXTRACTION_FAILED: 'AI_EXTRACTION_FAILED',

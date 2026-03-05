@@ -62,7 +62,7 @@ export async function GET() {
           projectName: keyEntries.projectName,
           description: keyEntries.description,
           environment: keyEntries.environment,
-          fileName: keyEntries.fileName,
+
           notes: keyEntries.notes,
           createdAt: keyEntries.createdAt,
           updatedAt: keyEntries.updatedAt,
@@ -92,7 +92,7 @@ export async function GET() {
           projectName: keyEntries.projectName,
           description: keyEntries.description,
           environment: keyEntries.environment,
-          fileName: keyEntries.fileName,
+
           notes: keyEntries.notes,
           createdAt: keyEntries.createdAt,
           updatedAt: keyEntries.updatedAt,

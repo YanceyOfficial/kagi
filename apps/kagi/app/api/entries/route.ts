@@ -16,9 +16,7 @@ const createSchema = z.object({
     .default('production'),
   // For 'simple': plain string
   // For 'group': key-value map
-  // For 'ssh'/'json': file content as string (Base64 or raw text)
   value: z.union([z.string(), z.record(z.string(), z.string())]),
-  fileName: z.string().max(255).optional(),
   notes: z.string().max(2000).optional(),
   expiresAt: z.string().datetime().optional()
 })
@@ -52,7 +50,6 @@ export async function GET(request: NextRequest) {
         projectName: keyEntries.projectName,
         description: keyEntries.description,
         environment: keyEntries.environment,
-        fileName: keyEntries.fileName,
         notes: keyEntries.notes,
         createdAt: keyEntries.createdAt,
         updatedAt: keyEntries.updatedAt,
@@ -91,7 +88,6 @@ export async function POST(request: NextRequest) {
       description,
       environment,
       value,
-      fileName,
       notes,
       expiresAt
     } = parsed.data
@@ -126,7 +122,6 @@ export async function POST(request: NextRequest) {
         description: description ?? null,
         environment,
         encryptedValue,
-        fileName: fileName ?? null,
         notes: notes ?? null,
         expiresAt: expiresAt ? new Date(expiresAt) : null
       })

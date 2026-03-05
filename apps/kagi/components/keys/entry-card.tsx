@@ -76,10 +76,11 @@ export function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
   function handleDownload() {
     if (!revealed) return
     let content: string
-    let filename = entry.fileName ?? 'key'
+    let filename: string
 
     if (typeof revealed.value === 'string') {
       content = revealed.value
+      filename = entry.projectName
     } else {
       content = Object.entries(revealed.value)
         .map(([k, v]) => `${k}="${v}"`)
@@ -203,14 +204,6 @@ export function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
           >
             {entry.environment}
           </Badge>
-          {entry.fileName && (
-            <Badge
-              variant="outline"
-              className="border-muted text-muted-foreground h-5 font-mono text-xs"
-            >
-              {entry.fileName}
-            </Badge>
-          )}
           <span className="text-muted-foreground ml-auto font-mono text-xs">
             {formatDistanceToNow(new Date(entry.createdAt), {
               addSuffix: true
