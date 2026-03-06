@@ -9,7 +9,8 @@ test.describe('Login page', () => {
     const pre = page.locator('pre')
     await expect(pre).toBeVisible()
     const text = await pre.textContent()
-    expect(text).toContain('KAGI')
+    // ASCII art for "KAGI" — check a distinctive portion of the art
+    expect(text).toContain('____ ___')
   })
 
   test('renders the subtitle with Japanese kanji', async ({ page }) => {
@@ -23,7 +24,7 @@ test.describe('Login page', () => {
 
   test('renders sign-in description', async ({ page }) => {
     await expect(
-      page.getByText('Sign in with your organisation account')
+      page.getByText('Sign in to manage your secrets')
     ).toBeVisible()
   })
 
@@ -59,15 +60,20 @@ test.describe('Login page', () => {
     ).toBeDisabled()
   })
 
-  test('SSO note is visible below the button', async ({ page }) => {
+  test('card description is visible', async ({ page }) => {
     await expect(
-      page.getByText(/authentication is handled by your organisation/i)
+      page.getByText(/sign in to manage your secrets/i)
     ).toBeVisible()
   })
 })
 
 test.describe('Unauthenticated redirects', () => {
   const PROTECTED_PAGES = ['/', '/keys', '/settings', '/2fa', '/envs']
+
+  test.beforeEach(async ({ page }) => {
+    // Clear any existing session cookies so server-side auth guards trigger
+    await page.context().clearCookies()
+  })
 
   for (const path of PROTECTED_PAGES) {
     test(`${path} redirects to /login`, async ({ page }) => {

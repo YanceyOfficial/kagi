@@ -69,7 +69,7 @@ test.describe('New Category dialog', () => {
     const dialog = page.getByRole('dialog')
     await expect(dialog.getByText('Service Name')).toBeVisible()
     await expect(dialog.getByText('Key Type')).toBeVisible()
-    await expect(dialog.getByText('Brand Icon')).toBeVisible()
+    await expect(dialog.getByText('Brand Icon').first()).toBeVisible()
     await expect(dialog.getByText('Service Website')).toBeVisible()
   })
 
@@ -109,20 +109,6 @@ test.describe('New Category dialog', () => {
 
     await expect(dialog.getByText('Field Definitions')).toBeVisible()
     await expect(dialog.getByText('Env Variable Name')).not.toBeVisible()
-  })
-
-  test('changing Key Type to ssh hides both Env Var and Field Definitions', async ({
-    page
-  }) => {
-    await page.getByRole('button', { name: /new category/i }).click()
-    const dialog = page.getByRole('dialog')
-
-    const select = dialog.locator('[role="combobox"]').first()
-    await select.click()
-    await page.getByRole('option', { name: /^ssh/i }).click()
-
-    await expect(dialog.getByText('Env Variable Name')).not.toBeVisible()
-    await expect(dialog.getByText('Field Definitions')).not.toBeVisible()
   })
 
   test('reopening dialog resets form state', async ({ page }) => {

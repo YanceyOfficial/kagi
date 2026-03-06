@@ -25,7 +25,15 @@ const MOCK_SESSION = {
 }
 
 const MOCK_STATS = {
-  data: { categories: 3, entries: 12, twoFaSets: 2 }
+  data: {
+    totalCategories: 3,
+    totalEntries: 12,
+    totalTwoFactorSets: 2,
+    keyTypeBreakdown: [],
+    environmentBreakdown: [],
+    recentEntries: [],
+    expiringEntries: []
+  }
 }
 
 function setupAuthMocks(page: import('@playwright/test').Page) {
@@ -202,8 +210,10 @@ test.describe('App sidebar navigation', () => {
     ).toBeVisible()
   })
 
-  test('sidebar contains AI Extract link', async ({ page }) => {
-    await expect(page.getByRole('link', { name: /ai extract/i })).toBeVisible()
+  test('sidebar contains Env Manager link', async ({ page }) => {
+    await expect(
+      page.getByRole('link', { name: /env manager/i })
+    ).toBeVisible()
   })
 
   test('sidebar contains Settings link', async ({ page }) => {

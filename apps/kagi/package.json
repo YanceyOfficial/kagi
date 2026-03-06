@@ -58,6 +58,7 @@
   "devDependencies": {
     "@kagi/eslint-config": "workspace:*",
     "@kagi/tsconfig": "workspace:*",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.16.0",

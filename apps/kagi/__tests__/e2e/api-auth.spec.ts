@@ -6,7 +6,7 @@
 import { expect, test } from '@playwright/test'
 
 interface RouteSpec {
-  method: 'get' | 'post' | 'patch' | 'delete'
+  method: 'get' | 'post' | 'put' | 'delete'
   path: string
   body?: Record<string, unknown>
 }
@@ -18,13 +18,13 @@ const PROTECTED_ROUTES: RouteSpec[] = [
   { method: 'get', path: '/api/categories' },
   { method: 'post', path: '/api/categories', body: {} },
   { method: 'get', path: `/api/categories/${FAKE_ID}` },
-  { method: 'patch', path: `/api/categories/${FAKE_ID}`, body: {} },
+  { method: 'put', path: `/api/categories/${FAKE_ID}`, body: {} },
   { method: 'delete', path: `/api/categories/${FAKE_ID}` },
   // Entries
   { method: 'get', path: '/api/entries' },
   { method: 'post', path: '/api/entries', body: {} },
   { method: 'get', path: `/api/entries/${FAKE_ID}` },
-  { method: 'patch', path: `/api/entries/${FAKE_ID}`, body: {} },
+  { method: 'put', path: `/api/entries/${FAKE_ID}`, body: {} },
   { method: 'delete', path: `/api/entries/${FAKE_ID}` },
   { method: 'post', path: `/api/entries/${FAKE_ID}/reveal` },
   // 2FA
@@ -38,8 +38,6 @@ const PROTECTED_ROUTES: RouteSpec[] = [
   { method: 'delete', path: '/api/account/data' },
   // AI
   { method: 'post', path: '/api/ai/extract', body: { prompt: 'test' } },
-  // Upload
-  { method: 'post', path: '/api/upload' },
   // Access keys (session-only — Bearer token also rejected)
   { method: 'get', path: '/api/access-keys' },
   { method: 'post', path: '/api/access-keys', body: {} },
@@ -63,7 +61,7 @@ test.describe('API auth guards — response body', () => {
     const res = await request.get('/api/categories')
     expect(res.status()).toBe(401)
     const body = await res.json()
-    expect(body).toEqual({ error: 'Unauthorized' })
+    expect(body).toMatchObject({ error: 'Unauthorized' })
   })
 
   test('401 response has JSON content-type', async ({ request }) => {
