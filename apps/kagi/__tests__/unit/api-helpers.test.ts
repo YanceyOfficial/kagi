@@ -71,7 +71,7 @@ describe('withAuth', () => {
     })
     const { body, status } = unwrap(res)
     expect(status).toBe(401)
-    expect(body).toEqual({ error: 'Unauthorized' })
+    expect(body).toEqual({ error: 'Unauthorized', code: 'AUTH_REQUIRED' })
   })
 
   it('returns 403 when handler throws AuthError with status 403', async () => {
@@ -91,16 +91,15 @@ describe('withAuth', () => {
     })
     const { body, status } = unwrap(res)
     expect(status).toBe(500)
-    expect(body).toEqual({ error: 'DB connection failed' })
+    expect(body).toEqual({ error: 'DB connection failed', code: 'INTERNAL_ERROR' })
   })
 
   it('returns 500 with fallback message when handler throws a non-Error', async () => {
     const res = await withAuth(async () => {
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
       throw 'string error'
     })
     const { body, status } = unwrap(res)
     expect(status).toBe(500)
-    expect(body).toEqual({ error: 'Internal server error' })
+    expect(body).toEqual({ error: 'Internal server error', code: 'INTERNAL_ERROR' })
   })
 })

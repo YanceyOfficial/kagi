@@ -117,4 +117,3 @@ export function useDeleteEntry() {
       sileo.error({ title: err.message, description: `Code: ${err.code}` })
   })
 }
-

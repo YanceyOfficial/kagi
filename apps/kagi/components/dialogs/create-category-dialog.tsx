@@ -97,7 +97,7 @@ export function CreateCategoryDialog({
       const cleaned: CreateKeyCategoryInput = {
         name: value.name,
         description: value.description || undefined,
-        iconSlug: value.iconSlug || null,
+        iconSlug: value.iconSlug || undefined,
         iconUrl: value.iconUrl ? buildFaviconUrl(value.iconUrl) : undefined,
         keyType: value.keyType,
         envVarName:
@@ -313,6 +313,7 @@ export function CreateCategoryDialog({
                               >
                                 {f}
                                 <button
+                                  title="close"
                                   type="button"
                                   onClick={() =>
                                     field.handleChange(

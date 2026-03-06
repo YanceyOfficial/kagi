@@ -14,8 +14,8 @@ describe('ACCESS_KEY_PREFIX', () => {
 })
 
 describe('ALL_SCOPES', () => {
-  it('contains exactly 11 scopes', () => {
-    expect(ALL_SCOPES).toHaveLength(11)
+  it('contains exactly 14 scopes', () => {
+    expect(ALL_SCOPES).toHaveLength(14)
   })
 
   it('contains every expected scope', () => {

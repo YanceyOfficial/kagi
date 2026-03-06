@@ -1,4 +1,14 @@
 import nextConfig from '@kagi/eslint-config/next'
 import { defineConfig } from 'eslint/config'
 
-export default defineConfig([...nextConfig])
+export default defineConfig([
+  ...nextConfig,
+  {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }
+      ]
+    }
+  }
+])
