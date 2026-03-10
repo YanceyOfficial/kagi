@@ -127,6 +127,7 @@ export function EnvProjectDetailClient() {
           <TabsContent key={fileType} value={fileType} className="mt-4">
             <EnvFileTab
               projectId={id}
+              projectName={project.name}
               fileType={fileType}
               existingFile={getFileForType(fileType)}
             />

@@ -4,7 +4,12 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
-import type { AiExtractResponse, AiSelectedKey, ApiSuccess } from '@/types'
+import type {
+  AiExtractResponse,
+  AiGeneratedSecret,
+  AiSelectedKey,
+  ApiSuccess
+} from '@/types'
 import { useMutation } from '@tanstack/react-query'
 import { Bot, Loader2, Sparkles, Wand2, X } from 'lucide-react'
 import { useState } from 'react'
@@ -16,11 +21,17 @@ const EXAMPLE_PROMPTS = [
   'Export GitHub SSH key and Google Analytics tracking ID'
 ]
 
-async function runAiExtract(prompt: string): Promise<AiExtractResponse> {
+async function runAiExtract({
+  prompt,
+  currentProjectName
+}: {
+  prompt: string
+  currentProjectName?: string
+}): Promise<AiExtractResponse> {
   const res = await fetch('/api/ai/extract', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt })
+    body: JSON.stringify({ prompt, currentProjectName })
   })
   if (!res.ok) {
     const err = await res.json()
@@ -33,9 +44,14 @@ async function runAiExtract(prompt: string): Promise<AiExtractResponse> {
 interface AiFillPanelProps {
   onApply: (content: string) => void
   onClose: () => void
+  currentProjectName?: string
 }
 
-export function AiFillPanel({ onApply, onClose }: AiFillPanelProps) {
+export function AiFillPanel({
+  onApply,
+  onClose,
+  currentProjectName
+}: AiFillPanelProps) {
   const [prompt, setPrompt] = useState('')
   const [result, setResult] = useState<AiExtractResponse | null>(null)
 
@@ -57,7 +73,7 @@ export function AiFillPanel({ onApply, onClose }: AiFillPanelProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!prompt.trim()) return
-    extractMutation.mutate(prompt)
+    extractMutation.mutate({ prompt, currentProjectName })
   }
 
   return (
@@ -123,11 +139,14 @@ export function AiFillPanel({ onApply, onClose }: AiFillPanelProps) {
 
         {result &&
           !extractMutation.isPending &&
-          result.selectedKeys.length > 0 && (
+          (result.selectedKeys.length > 0 ||
+            result.generatedSecrets.length > 0) && (
             <div className="space-y-2 border-t pt-3">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-xs font-medium">
                   {result.selectedKeys.length} key(s) selected
+                  {result.generatedSecrets.length > 0 &&
+                    `, ${result.generatedSecrets.length} secret(s) generated`}
                 </span>
                 <Button
                   size="sm"
@@ -149,6 +168,19 @@ export function AiFillPanel({ onApply, onClose }: AiFillPanelProps) {
                     </Badge>
                     <span className="text-muted-foreground font-mono text-xs">
                       {key.reason}
+                    </span>
+                  </li>
+                ))}
+                {result.generatedSecrets.map((s: AiGeneratedSecret) => (
+                  <li key={s.envVarName} className="flex items-start gap-2">
+                    <Badge
+                      variant="outline"
+                      className="border-yellow-500/40 text-yellow-400 mt-0.5 shrink-0 font-mono text-xs"
+                    >
+                      {s.envVarName}
+                    </Badge>
+                    <span className="text-muted-foreground font-mono text-xs">
+                      {s.reason} ({s.format}, {s.bytes}B)
                     </span>
                   </li>
                 ))}

@@ -16,12 +16,14 @@ import { SecretGenerator } from './secret-generator'
 
 interface EnvFileTabProps {
   projectId: string
+  projectName: string
   fileType: EnvFileType
   existingFile: EnvFile | undefined
 }
 
 export function EnvFileTab({
   projectId,
+  projectName,
   fileType,
   existingFile
 }: EnvFileTabProps) {
@@ -197,7 +199,11 @@ export function EnvFileTab({
 
       {/* AI panel */}
       {aiOpen && (
-        <AiFillPanel onApply={handleAiApply} onClose={() => setAiOpen(false)} />
+        <AiFillPanel
+          onApply={handleAiApply}
+          onClose={() => setAiOpen(false)}
+          currentProjectName={projectName}
+        />
       )}
 
       {/* Editor or placeholder */}

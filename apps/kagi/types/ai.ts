@@ -27,8 +27,16 @@ export interface AiSelectedKey {
   reason: string
 }
 
+export interface AiGeneratedSecret {
+  envVarName: string
+  format: 'hex' | 'base64' | 'base64url' | 'alphanumeric'
+  bytes: number
+  reason: string
+}
+
 export interface AiExtractResponse {
   selectedKeys: AiSelectedKey[]
-  // Generated .env file content (with real decrypted values)
+  generatedSecrets: AiGeneratedSecret[]
+  // Generated .env file content (with real decrypted values + generated secrets)
   envContent: string
 }
