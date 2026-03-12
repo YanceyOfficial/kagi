@@ -1,11 +1,18 @@
+# Build from repo root:
+#   docker build -f apps/kagi/Dockerfile -t kagi .
+
 # ─── Stage 1: Dependencies ───────────────────────────────────────────────────
 FROM node:22-alpine AS deps
 WORKDIR /app
 
-# Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy workspace manifests first for layer caching
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY apps/kagi/package.json ./apps/kagi/
+COPY packages/eslint-config/package.json ./packages/eslint-config/
+COPY packages/tsconfig/package.json ./packages/tsconfig/
+
 RUN pnpm install --frozen-lockfile
 
 # ─── Stage 2: Builder ────────────────────────────────────────────────────────
@@ -15,11 +22,11 @@ WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/kagi/node_modules ./apps/kagi/node_modules
 COPY . .
 
-# Build the Next.js application
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm build
+RUN cd apps/kagi && pnpm build
 
 # ─── Stage 3: Runner ─────────────────────────────────────────────────────────
 FROM node:22-alpine AS runner
@@ -28,15 +35,19 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy only the necessary build output
-COPY --from=builder /app/public ./public
+# In a monorepo standalone build the output mirrors the full path tree:
+#   .next/standalone/apps/kagi/server.js
+COPY --from=builder /app/apps/kagi/public ./apps/kagi/public
 
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kagi/.next/static
+
+# Migration files and runner (used by the migrate service in docker-compose)
+COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle ./apps/kagi/drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts ./apps/kagi/scripts
 
 USER nextjs
 
@@ -45,4 +56,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["node", "apps/kagi/server.js"]

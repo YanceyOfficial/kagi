@@ -7,46 +7,27 @@ This guide walks you through self-hosting Kagi and making your first API call.
 
 ## Prerequisites
 
-- Docker + Docker Compose (or a PostgreSQL instance)
-- Node.js 20+ and pnpm 9+
-- At least one auth provider configured (see step 1)
+- Docker + Docker Compose
 
-## 1. Choose an auth provider
+## 1. Choose an auth method
 
-Kagi supports multiple login methods. Configure at least one.
+Kagi supports two login methods — pick one.
 
-### Option A — Email / password (simplest, no external dependencies)
+### Option A — Email / password
+
+The simplest option, no external dependencies required.
 
 ```bash
 ENABLE_EMAIL_PASSWORD=true
 ADMIN_EMAIL=you@example.com
 ADMIN_PASSWORD=<your-password>
-ADMIN_NAME=Admin          # optional
 ```
 
 On first startup, Kagi automatically creates the admin account from these values.
 
-### Option B — Google OAuth
+### Option B — Keycloak (SSO)
 
-```bash
-GOOGLE_CLIENT_ID=<client-id>
-GOOGLE_CLIENT_SECRET=<client-secret>
-```
-
-Create credentials at [console.cloud.google.com](https://console.cloud.google.com) → APIs & Services → Credentials.
-Set the authorised redirect URI to `https://your-kagi-url/api/auth/callback/google`.
-
-### Option C — GitHub OAuth
-
-```bash
-GITHUB_CLIENT_ID=<client-id>
-GITHUB_CLIENT_SECRET=<client-secret>
-```
-
-Create an OAuth app at github.com → Settings → Developer settings → OAuth Apps.
-Set the callback URL to `https://your-kagi-url/api/auth/callback/github`.
-
-### Option D — Keycloak
+For teams or when you already run Keycloak. See [Keycloak Setup](/guides/keycloak/) for a full Docker Compose walkthrough.
 
 ```bash
 KEYCLOAK_URL=https://sso.example.com
@@ -55,25 +36,17 @@ KEYCLOAK_CLIENT_ID=kagi
 KEYCLOAK_CLIENT_SECRET=<client-secret>
 ```
 
-See [Keycloak Setup](/guides/keycloak/) for a full Docker Compose walkthrough.
+Set the Keycloak client's redirect URI to `https://your-kagi-url/api/auth/callback/keycloak`.
 
 ---
 
-Multiple options can be enabled simultaneously — the login page shows all configured providers.
+## 2. Configure environment variables
 
-## 2. Clone and configure
-
-```bash
-git clone https://github.com/YanceyOfficial/kagi.git
-cd kagi
-cp apps/kagi/.env.example apps/kagi/.env
-```
-
-Edit `apps/kagi/.env` and fill in the required values:
+Create an `.env` file in the same directory as `docker-compose.yml`:
 
 ```bash
-# Database
-DATABASE_URL=postgresql://kagi:kagi@localhost:5432/kagi
+# Database — auto-managed by Docker Compose
+POSTGRES_PASSWORD=secret
 
 # Encryption — generate with: openssl rand -hex 32
 KAGI_ENCRYPTION_KEY=<64-hex-chars>
@@ -83,45 +56,73 @@ BETTER_AUTH_SECRET=<random-string>
 BETTER_AUTH_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Auth provider(s) — see step 1
+# Auth — pick one or both from step 1
 ENABLE_EMAIL_PASSWORD=true
 ADMIN_EMAIL=you@example.com
 ADMIN_PASSWORD=<your-password>
 
-# OpenAI (for AI extraction feature)
+# OpenAI (optional — for AI extraction feature)
 OPENAI_API_KEY=sk-...
 ```
 
-## 3. Start the database
+## 3. Start with Docker Compose
+
+### Option A — Prebuilt image (recommended)
 
 ```bash
-docker compose up -d postgres
+docker compose up -d
 ```
 
-Or point `DATABASE_URL` at an existing PostgreSQL instance.
+The `docker-compose.yml` uses `yanceyofficial/kagi:latest` by default — no build step needed.
 
-## 4. Run migrations
+### Option B — Build from source
+
+Clone the repo, edit `docker-compose.yml` to swap the image for a local build:
 
 ```bash
-pnpm --filter kagi db:push
+git clone https://github.com/YanceyOfficial/kagi.git
+cd kagi/apps/kagi
 ```
 
-## 5. Start the dev server
+In `docker-compose.yml`, comment out `image:` and uncomment the `build:` block:
+
+```yaml
+app:
+  # image: yanceyofficial/kagi:latest   # ← comment this out
+  build:
+    context: .
+    dockerfile: Dockerfile
+```
+
+Then start:
 
 ```bash
-pnpm dev
+docker compose up -d --build
 ```
+
+## 4. Database migrations
+
+Migrations run automatically via the `migrate` service in `docker-compose.yml` before the app starts. You don't need to do anything manually.
+
+When you pull a new image, the same flow applies — just restart:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Docker Compose will re-run the `migrate` service, apply any new migrations, then start the app.
 
 The app is now running at [http://localhost:3000](http://localhost:3000).
 
-## 6. Log in and create an access key
+## 5. Log in and create an access key
 
 1. Open `http://localhost:3000` and sign in.
 2. Go to **Settings → API Keys**.
 3. Click **New API Key**, give it a name, select scopes, and click **Create**.
 4. Copy the key — it is shown **only once**.
 
-## 7. Make your first API call
+## 6. Make your first API call
 
 ```bash
 # List your categories
@@ -136,7 +137,7 @@ curl -X POST \
   http://localhost:3000/api/entries/<entry-id>/reveal
 ```
 
-## 8. Explore the OpenAPI spec
+## 7. Explore the OpenAPI spec
 
 The full OpenAPI 3.1.0 spec is served at:
 
@@ -144,7 +145,7 @@ The full OpenAPI 3.1.0 spec is served at:
 GET /api/openapi
 ```
 
-You can import this URL directly into Postman, Insomnia, or any OpenAPI-compatible client.
+Import this URL directly into Postman, Insomnia, or any OpenAPI-compatible client.
 
 ## Next steps
 

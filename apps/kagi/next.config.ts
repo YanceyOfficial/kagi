@@ -14,15 +14,6 @@ const nextConfig: NextConfig = {
       sileo: require.resolve('sileo/dist/index.js')
     }
     return config
-  },
-
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        // Same fix for Turbopack — one sileo instance = one toast store
-        sileo: './node_modules/sileo/dist/index.js'
-      }
-    }
   }
 }
 

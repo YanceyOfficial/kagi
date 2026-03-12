@@ -1,7 +1,9 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import type * as monacoEditor from 'monaco-editor'
+import type { EditorDidMount } from 'react-monaco-editor'
+
+type MonacoInstance = Parameters<EditorDidMount>[1]
 
 // Monaco Editor must not be server-rendered
 const MonacoEditor = dynamic(() => import('react-monaco-editor'), {
@@ -16,7 +18,7 @@ interface EnvFileEditorProps {
 
 let _registered = false
 
-function registerDotenv(monaco: typeof monacoEditor) {
+function registerDotenv(monaco: MonacoInstance) {
   if (_registered) return
   _registered = true
 

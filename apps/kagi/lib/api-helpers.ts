@@ -9,7 +9,7 @@ import {
 } from '@/lib/access-key'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { accessKeys } from '@/lib/db/schema'
+import { accessKeys, user as userTable } from '@/lib/db/schema'
 import { ErrorCode } from '@/lib/error-codes'
 import { and, eq, gt, isNull, or } from 'drizzle-orm'
 import { headers } from 'next/headers'
@@ -91,7 +91,15 @@ export async function requireSession(requiredScope?: AccessKeyScope) {
     )
   }
 
-  return { user: { id: userId } }
+  const [userRow] = await db
+    .select({ id: userTable.id, name: userTable.name, email: userTable.email })
+    .from(userTable)
+    .where(eq(userTable.id, userId))
+    .limit(1)
+
+  if (!userRow) throw new AuthError('User not found', 401, ErrorCode.AUTH_REQUIRED)
+
+  return { user: userRow }
 }
 
 /**

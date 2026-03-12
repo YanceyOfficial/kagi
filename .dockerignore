@@ -21,6 +21,9 @@ out
 # Docs app is not part of the production image
 apps/docs
 
+# Stray lockfile — root pnpm-lock.yaml is the authoritative one
+apps/kagi/pnpm-lock.yaml
+
 # Test files
 **/__tests__
 **/*.test.ts
