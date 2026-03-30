@@ -10,6 +10,7 @@ export const authProviders = {
   keycloak: !!(
     process.env.KEYCLOAK_URL &&
     process.env.KEYCLOAK_CLIENT_ID &&
+    process.env.KEYCLOAK_REALM &&
     process.env.KEYCLOAK_CLIENT_SECRET
   ),
   emailPassword: process.env.ENABLE_EMAIL_PASSWORD === 'true'
