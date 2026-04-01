@@ -130,11 +130,7 @@ docker compose pull
 docker compose up -d
 
 # Run database migrations
-docker run --rm --network kagi_default \
-  -e DATABASE_URL=postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi \
-  -v ./apps/kagi/drizzle:/app/drizzle \
-  -v ./apps/kagi/scripts:/app/scripts \
-  -w /app node:24-alpine sh -c "npm install drizzle-orm pg && node scripts/migrate.mjs"
+docker compose run --rm migrate
 
 # Check logs
 docker compose logs -f app
@@ -155,11 +151,7 @@ docker compose pull
 docker compose up -d
 
 # 3. Run database migrations
-docker run --rm --network kagi_default \
-  -e DATABASE_URL=postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi \
-  -v ./apps/kagi/drizzle:/app/drizzle \
-  -v ./apps/kagi/scripts:/app/scripts \
-  -w /app node:24-alpine sh -c "npm install drizzle-orm pg && node scripts/migrate.mjs"
+docker compose run --rm migrate
 ```
 
 ### Environment variables for Docker

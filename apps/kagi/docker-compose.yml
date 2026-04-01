@@ -19,12 +19,7 @@ services:
 
   # ─── Kagi Application ───────────────────────────────────────────────────────
   app:
-    # Use the prebuilt image from Docker Hub (recommended)
     image: yanceyofficial/kagi:latest
-    # To build from source instead, comment out the image line above and uncomment:
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       db:
@@ -42,6 +37,18 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
     ports:
       - '3000:3000'
+
+  # ─── Database Migration (run manually) ─────────────────────────────────────
+  migrate:
+    image: yanceyofficial/kagi:migrate
+    restart: no
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
+    profiles:
+      - migration
 
 volumes:
   postgres_data:
