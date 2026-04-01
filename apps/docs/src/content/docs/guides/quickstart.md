@@ -15,10 +15,12 @@ Kagi supports two login methods — pick one or both.
 
 ### Option A — Email / password
 
-The simplest option, no external dependencies required.
+The simplest option, no external dependencies required. An admin account is created automatically on first startup.
 
 ```bash
 ENABLE_EMAIL_PASSWORD=true
+ADMIN_EMAIL=you@example.com
+ADMIN_PASSWORD=your-password
 ```
 
 ### Option B — Keycloak (SSO)
@@ -54,6 +56,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Auth — pick one or both from step 1
 ENABLE_EMAIL_PASSWORD=true
+ADMIN_EMAIL=you@example.com
+ADMIN_PASSWORD=<your-password>
 
 # Keycloak (optional — see step 1)
 # KEYCLOAK_URL=https://sso.example.com
