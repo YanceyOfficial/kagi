@@ -2,7 +2,9 @@
 
 > A self-hosted private key management system with AI-powered extraction.
 
-Kagi (Japanese: 鍵, _key_) is a secure vault for all your private keys, API credentials, SSH keys, and 2FA recovery tokens. Keys are encrypted at rest with AES-256-GCM and accessed through a clean, geeky terminal-themed interface.
+Kagi (Japanese: 鍵, _key_) is a secure vault for all your API keys, environment configs, `.env` files, and 2FA recovery tokens. Keys are encrypted at rest with AES-256-GCM and accessed through a clean, geeky terminal-themed interface.
+
+![Dashboard](https://raw.githubusercontent.com/YanceyOfficial/kagi/master/apps/docs/src/assets/screenshots/dashboard.png)
 
 ---
 
