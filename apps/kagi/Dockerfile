@@ -44,10 +44,12 @@ COPY --from=builder /app/apps/kagi/public ./apps/kagi/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kagi/.next/static
 
-# Migration runner, SQL files, and dependencies for migrate.mjs
+# Migration runner and SQL files
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle ./apps/kagi/drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts ./apps/kagi/scripts
-COPY --from=deps --chown=nextjs:nodejs /app/apps/kagi/node_modules ./apps/kagi/node_modules
+
+# Install migrate.mjs dependencies (pnpm symlinks don't survive COPY)
+RUN cd apps/kagi && npm install --no-save drizzle-orm pg
 
 USER nextjs
 
