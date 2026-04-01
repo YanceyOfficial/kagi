@@ -41,9 +41,34 @@ Each project has tabs for different file types. Click "Reveal to edit" to decryp
 
 ## AI-powered .env generation
 
-Describe what you need in plain English — the AI selects the right keys from your vault and generates a ready-to-paste `.env` file. **The AI only sees key names and project names, never actual secret values.** Decryption happens server-side after the AI makes its selection.
+Click "AI Generate" in any env project, describe what you need in plain English, and Kagi assembles a ready-to-paste `.env` file from your vault.
 
 ![AI Generate](../../../assets/screenshots/ai-generate.png)
+
+### Privacy-first design
+
+The AI **never sees your actual secret values**. Here's how it works:
+
+1. Kagi sends only **key names, project names, and env var names** to the AI model (GPT-4o-mini)
+2. The AI analyzes your prompt and returns a list of **entry IDs** it thinks you need
+3. The server **validates** those IDs against your actual entries (prevents injection)
+4. Decryption happens **entirely server-side** — the AI is never in the loop for secret values
+5. The assembled `.env` file is returned to your browser
+
+```
+Your prompt → AI sees: [category names, project names, env var names]
+           → AI returns: [entry IDs]
+           → Server decrypts selected entries
+           → .env file assembled and returned
+```
+
+### Smart context awareness
+
+- **Framework detection** — mention "Next.js" and the AI automatically applies `NEXT_PUBLIC_` prefixes where appropriate. For Electron, React Native, or plain Node.js it uses the raw env var names as defined.
+- **Project scoping** — if you're inside a project (e.g. "Kagi"), saying "this project" or "current project" automatically scopes to entries matching that project name.
+- **Multi-field groups** — for `group` type keys (e.g. AWS with `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY`, `REGION`), all fields are expanded into separate env vars.
+- **Secret generation** — ask for "a session secret" or "random JWT key" and the AI generates cryptographically secure random values (hex, base64, base64url, or alphanumeric) without touching the vault. All generated env var names are normalized to `SCREAMING_SNAKE_CASE`.
+- **Bilingual prompts** — works with both English and Chinese prompts (e.g. "获取 OpenAI 密钥" or "给我生成一个随机密钥").
 
 ## 2FA recovery tokens
 
