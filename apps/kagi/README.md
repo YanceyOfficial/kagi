@@ -130,7 +130,7 @@ docker compose pull
 docker compose up -d
 
 # Run database migrations
-docker compose exec app sh -c "NODE_PATH=/app/migrate_deps/node_modules node apps/kagi/scripts/migrate.mjs"
+docker compose exec app node apps/kagi/scripts/migrate.mjs
 
 # Check logs
 docker compose logs -f app
@@ -151,7 +151,7 @@ docker compose pull
 docker compose up -d
 
 # 3. Run database migrations
-docker compose exec app sh -c "NODE_PATH=/app/migrate_deps/node_modules node apps/kagi/scripts/migrate.mjs"
+docker compose exec app node apps/kagi/scripts/migrate.mjs
 ```
 
 ### Environment variables for Docker

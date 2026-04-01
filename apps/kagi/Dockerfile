@@ -48,11 +48,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kag
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle ./apps/kagi/drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts ./apps/kagi/scripts
 
-# Install migrate.mjs deps into a separate directory to avoid pnpm workspace:* in package.json
-RUN mkdir -p /app/migrate_deps && cd /app/migrate_deps \
-    && echo '{"private":true}' > package.json \
+# Install migrate.mjs deps (ESM needs them on the node_modules lookup path)
+RUN cd /tmp && echo '{"private":true}' > package.json \
     && npm install drizzle-orm pg \
-    && rm package.json
+    && cp -r node_modules/* /app/node_modules/ \
+    && rm -rf /tmp/package.json /tmp/node_modules /tmp/package-lock.json
 
 USER nextjs
 
