@@ -3,6 +3,12 @@ title: Quick Start
 description: Get Kagi running in 5 minutes.
 ---
 
+import { Aside } from '@astrojs/starlight/components'
+
+<Aside type="tip" title="Quick links">
+  [`docker-compose.yml`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/docker-compose.yml) · [`.env.example`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/.env.example)
+</Aside>
+
 This guide walks you through self-hosting Kagi and making your first API call.
 
 ## Prerequisites
@@ -40,7 +46,7 @@ Set the Keycloak client's redirect URI to `https://your-kagi-url/api/auth/callba
 
 ## 2. Configure environment variables
 
-Download [`docker-compose.yml`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/docker-compose.yml) and create an `.env` file in the same directory (see [`.env.example`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/.env.example) for all available options):
+Create an `.env` file in the same directory as `docker-compose.yml`:
 
 ```bash
 # Database — auto-managed by Docker Compose
