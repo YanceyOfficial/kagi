@@ -35,6 +35,16 @@ Store encrypted `.env`, `.env.local`, `.env.production`, and `.env.development` 
 
 ![Env Manager](../../../assets/screenshots/envs.png)
 
+Each project has tabs for different file types. Click "Reveal to edit" to decrypt and modify content, or use "AI Generate" to automatically assemble a `.env` file from your stored keys.
+
+![Env Project Detail](../../../assets/screenshots/env-detail.png)
+
+## AI-powered .env generation
+
+Describe what you need in plain English — the AI selects the right keys from your vault and generates a ready-to-paste `.env` file. **The AI only sees key names and project names, never actual secret values.** Decryption happens server-side after the AI makes its selection.
+
+![AI Generate](../../../assets/screenshots/ai-generate.png)
+
 ## 2FA recovery tokens
 
 Securely store two-factor authentication backup codes. Tokens are encrypted and can be revealed one at a time with usage tracking.
