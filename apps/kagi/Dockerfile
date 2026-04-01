@@ -44,16 +44,6 @@ COPY --from=builder /app/apps/kagi/public ./apps/kagi/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kagi/.next/static
 
-# Migration runner and SQL files
-COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle ./apps/kagi/drizzle
-COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts ./apps/kagi/scripts
-
-# Install migrate.mjs deps (ESM needs them on the node_modules lookup path)
-RUN cd /tmp && echo '{"private":true}' > package.json \
-    && npm install drizzle-orm pg \
-    && cp -r node_modules/* /app/node_modules/ \
-    && rm -rf /tmp/package.json /tmp/node_modules /tmp/package-lock.json
-
 USER nextjs
 
 EXPOSE 3000
