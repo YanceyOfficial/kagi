@@ -123,14 +123,9 @@ A `Dockerfile` and `docker-compose.yml` are included for production deployment.
 # Copy and fill in environment variables
 cp .env.example .env
 
-# Pull the latest images
+# Pull the latest images and start (migrations run automatically before app starts)
 docker compose pull
-
-# Start the services
 docker compose up -d
-
-# Run database migrations
-docker compose run --rm migrate
 
 # Check logs
 docker compose logs -f app
@@ -139,20 +134,17 @@ docker compose logs -f app
 The compose file starts:
 
 - `db` — PostgreSQL 17
+- `migrate` — one-shot migration runner (runs automatically before app)
 - `app` — Kagi application on port 3000
 
 ### Upgrading
 
 ```bash
-# 1. Pull the latest images
 docker compose pull
-
-# 2. Restart containers
 docker compose up -d
-
-# 3. Run database migrations
-docker compose run --rm migrate
 ```
+
+Migrations run automatically on every `docker compose up`. The `migrate` service completes before `app` starts.
 
 ### Environment variables for Docker
 

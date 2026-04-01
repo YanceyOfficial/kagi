@@ -17,6 +17,16 @@ services:
       timeout: 5s
       retries: 5
 
+  # ─── Database Migration (one-shot, runs before app starts) ─────────────────
+  migrate:
+    image: yanceyofficial/kagi:migrate
+    restart: no
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
+
   # ─── Kagi Application ───────────────────────────────────────────────────────
   app:
     image: yanceyofficial/kagi:latest
@@ -24,6 +34,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
@@ -37,18 +49,6 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
     ports:
       - '3000:3000'
-
-  # ─── Database Migration (run manually) ─────────────────────────────────────
-  migrate:
-    image: yanceyofficial/kagi:migrate
-    restart: no
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
-    profiles:
-      - migration
 
 volumes:
   postgres_data:
