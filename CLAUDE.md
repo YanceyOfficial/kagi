@@ -10,7 +10,6 @@ kagi/                        ← repo root (Turborepo)
 │   ├── kagi/                ← Next.js main application
 │   └── docs/                ← Astro Starlight documentation site
 └── packages/
-    ├── eslint-config/       ← @kagi/eslint-config (base.mjs, next.mjs)
     └── tsconfig/            ← @kagi/tsconfig (base.json, nextjs.json)
 ```
 

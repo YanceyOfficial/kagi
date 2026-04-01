@@ -18,7 +18,6 @@ apps/
   kagi/   — Next.js main application
   docs/   — Astro Starlight documentation site
 packages/
-  eslint-config/   — shared ESLint rules (@kagi/eslint-config)
   tsconfig/        — shared TypeScript configs (@kagi/tsconfig)
 ```
 
