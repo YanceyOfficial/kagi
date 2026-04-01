@@ -44,9 +44,10 @@ COPY --from=builder /app/apps/kagi/public ./apps/kagi/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kagi/.next/static
 
-# Migration files and runner (used by the migrate service in docker-compose)
+# Migration runner, SQL files, and dependencies for migrate.mjs
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle ./apps/kagi/drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts ./apps/kagi/scripts
+COPY --from=deps --chown=nextjs:nodejs /app/apps/kagi/node_modules ./apps/kagi/node_modules
 
 USER nextjs
 
