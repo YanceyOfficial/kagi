@@ -39,7 +39,7 @@ Each project has tabs for different file types. Click "Reveal to edit" to decryp
 
 ![Env Project Detail](../../../assets/screenshots/env-detail.png)
 
-## AI-powered .env generation
+## 🌟 AI-powered .env generation
 
 Click "AI Generate" in any env project, describe what you need in plain English, and Kagi assembles a ready-to-paste `.env` file from your vault.
 
@@ -68,7 +68,7 @@ Your prompt → AI sees: [category names, project names, env var names]
 - **Project scoping** — if you're inside a project (e.g. "Kagi"), saying "this project" or "current project" automatically scopes to entries matching that project name.
 - **Multi-field groups** — for `group` type keys (e.g. AWS with `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY`, `REGION`), all fields are expanded into separate env vars.
 - **Secret generation** — ask for "a session secret" or "random JWT key" and the AI generates cryptographically secure random values (hex, base64, base64url, or alphanumeric) without touching the vault. All generated env var names are normalized to `SCREAMING_SNAKE_CASE`.
-- **Bilingual prompts** — works with both English and Chinese prompts (e.g. "获取 OpenAI 密钥" or "给我生成一个随机密钥").
+- **Multilingual prompts** — powered by GPT-4o-mini, prompts work in any language — English, Chinese, Japanese, Spanish, and more.
 
 ## 2FA recovery tokens
 
