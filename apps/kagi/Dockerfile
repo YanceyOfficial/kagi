@@ -48,8 +48,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kag
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle ./apps/kagi/drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts ./apps/kagi/scripts
 
-# Install migrate.mjs dependencies in a clean directory (npm can't parse workspace:* in package.json)
-RUN mkdir -p /tmp/migrate-deps && cd /tmp/migrate-deps && npm init -y > /dev/null 2>&1 && npm install --no-save drizzle-orm pg && cp -r node_modules /app/apps/kagi/node_modules && rm -rf /tmp/migrate-deps
+# Install migrate.mjs deps into a separate directory to avoid pnpm workspace:* in package.json
+RUN mkdir -p /app/migrate_deps && cd /app/migrate_deps \
+    && echo '{"private":true}' > package.json \
+    && npm install drizzle-orm pg \
+    && rm package.json
 
 USER nextjs
 

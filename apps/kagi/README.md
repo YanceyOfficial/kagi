@@ -123,8 +123,14 @@ A `Dockerfile` and `docker-compose.yml` are included for production deployment.
 # Copy and fill in environment variables
 cp .env.example .env
 
-# Build and start
+# Pull the latest images
+docker compose pull
+
+# Start the services
 docker compose up -d
+
+# Run database migrations
+docker compose exec app sh -c "NODE_PATH=/app/migrate_deps/node_modules node apps/kagi/scripts/migrate.mjs"
 
 # Check logs
 docker compose logs -f app
@@ -135,11 +141,18 @@ The compose file starts:
 - `db` — PostgreSQL 17
 - `app` — Kagi application on port 3000
 
-> **Note:** Run database migrations separately before or after first boot:
->
-> ```bash
-> docker compose run --rm app sh -c "npx drizzle-kit migrate"
-> ```
+### Upgrading
+
+```bash
+# 1. Pull the latest images
+docker compose pull
+
+# 2. Restart containers
+docker compose up -d
+
+# 3. Run database migrations
+docker compose exec app sh -c "NODE_PATH=/app/migrate_deps/node_modules node apps/kagi/scripts/migrate.mjs"
+```
 
 ### Environment variables for Docker
 

@@ -17,20 +17,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # ─── DB Migration runner (one-shot) ─────────────────────────────────────────
-  migrate:
-    image: yanceyofficial/kagi:latest
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
-    restart: no
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
-    command: ['node', 'apps/kagi/scripts/migrate.mjs']
-
   # ─── Kagi Application ───────────────────────────────────────────────────────
   app:
     # Use the prebuilt image from Docker Hub (recommended)
@@ -43,8 +29,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
