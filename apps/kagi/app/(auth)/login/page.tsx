@@ -3,6 +3,7 @@ import { authProviders } from '@/lib/auth'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Sign In' }
+export const dynamic = 'force-dynamic'
 
 export default function LoginPage() {
   return (
