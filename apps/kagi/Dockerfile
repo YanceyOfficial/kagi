@@ -48,8 +48,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kag
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle ./apps/kagi/drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts ./apps/kagi/scripts
 
-# Install migrate.mjs dependencies (pnpm symlinks don't survive COPY)
-RUN cd apps/kagi && npm install --no-save drizzle-orm pg
+# Install migrate.mjs dependencies in a clean directory (npm can't parse workspace:* in package.json)
+RUN mkdir -p /tmp/migrate-deps && cd /tmp/migrate-deps && npm init -y > /dev/null 2>&1 && npm install --no-save drizzle-orm pg && cp -r node_modules /app/apps/kagi/node_modules && rm -rf /tmp/migrate-deps
 
 USER nextjs
 
