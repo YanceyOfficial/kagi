@@ -4,7 +4,7 @@ description: Get Kagi running in 5 minutes.
 ---
 
 :::tip[Quick links]
-[`docker-compose.yml`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/docker-compose.yml) · [`.env.example`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/.env.example)
+Download [`docker-compose.yml`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/docker-compose.yml) to get the production-ready Compose file, and refer to [`.env.example`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/.env.example) for a complete list of all available environment variables with descriptions.
 :::
 
 This guide walks you through self-hosting Kagi and making your first API call.
