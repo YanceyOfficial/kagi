@@ -3,11 +3,9 @@ title: Quick Start
 description: Get Kagi running in 5 minutes.
 ---
 
-import { Aside } from '@astrojs/starlight/components'
-
-<Aside type="tip" title="Quick links">
-  [`docker-compose.yml`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/docker-compose.yml) · [`.env.example`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/.env.example)
-</Aside>
+:::tip[Quick links]
+[`docker-compose.yml`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/docker-compose.yml) · [`.env.example`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/.env.example)
+:::
 
 This guide walks you through self-hosting Kagi and making your first API call.
 
