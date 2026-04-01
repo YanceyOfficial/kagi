@@ -49,30 +49,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & push app image
-        uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v6
         with:
           context: .
           file: apps/kagi/Dockerfile
-          target: runner
           platforms: linux/arm64
           push: true
           tags: |
             yanceyofficial/kagi:${{ steps.version.outputs.version }}
             yanceyofficial/kagi:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build & push migrate image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/kagi/Dockerfile
-          target: migrator
-          platforms: linux/arm64
-          push: true
-          tags: |
-            yanceyofficial/kagi:migrate
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

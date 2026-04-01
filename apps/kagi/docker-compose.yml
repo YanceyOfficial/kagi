@@ -17,25 +17,13 @@ services:
       timeout: 5s
       retries: 5
 
-  # ─── Database Migration (one-shot, runs before app starts) ─────────────────
-  migrate:
-    image: yanceyofficial/kagi:migrate
-    restart: no
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
-
-  # ─── Kagi Application ───────────────────────────────────────────────────────
+  # ─── Kagi Application (migrations run automatically on startup) ─────────────
   app:
     image: yanceyofficial/kagi:latest
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
-      migrate:
-        condition: service_completed_successfully
     environment:
       DATABASE_URL: postgresql://kagi:${POSTGRES_PASSWORD:-secret}@db:5432/kagi
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}

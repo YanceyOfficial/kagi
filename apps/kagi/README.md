@@ -134,8 +134,7 @@ docker compose logs -f app
 The compose file starts:
 
 - `db` — PostgreSQL 17
-- `migrate` — one-shot migration runner (runs automatically before app)
-- `app` — Kagi application on port 3000
+- `app` — Kagi application on port 3000 (migrations run automatically on startup)
 
 ### Upgrading
 
@@ -144,7 +143,7 @@ docker compose pull
 docker compose up -d
 ```
 
-Migrations run automatically on every `docker compose up`. The `migrate` service completes before `app` starts.
+Migrations run automatically on every startup before the app begins serving requests.
 
 ### Environment variables for Docker
 

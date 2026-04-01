@@ -44,6 +44,19 @@ COPY --from=builder /app/apps/kagi/public ./apps/kagi/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/.next/static ./apps/kagi/.next/static
 
+# Self-contained migrate directory with deps + SQL files
+# Layout: /app/migrate/scripts/migrate.mjs + /app/migrate/drizzle/migrations/
+# This preserves the ../drizzle/migrations relative path from the script
+RUN mkdir -p /app/migrate/scripts && cd /app/migrate \
+    && echo '{"private":true,"type":"module"}' > package.json \
+    && npm install drizzle-orm pg \
+    && rm package.json package-lock.json
+COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/drizzle /app/migrate/drizzle
+COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts/migrate.mjs /app/migrate/scripts/migrate.mjs
+
+# Entrypoint: migrate then start
+COPY --from=builder --chown=nextjs:nodejs /app/apps/kagi/scripts/entrypoint.sh /app/entrypoint.sh
+
 USER nextjs
 
 EXPOSE 3000
@@ -51,15 +64,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "apps/kagi/server.js"]
-
-# ─── Stage 4: Migrator (lightweight image with full deps for migrations) ────
-FROM node:24-alpine AS migrator
-WORKDIR /app
-
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/kagi/node_modules ./apps/kagi/node_modules
-COPY --from=builder /app/apps/kagi/drizzle ./apps/kagi/drizzle
-COPY --from=builder /app/apps/kagi/scripts ./apps/kagi/scripts
-
-CMD ["node", "apps/kagi/scripts/migrate.mjs"]
+CMD ["/app/entrypoint.sh"]
