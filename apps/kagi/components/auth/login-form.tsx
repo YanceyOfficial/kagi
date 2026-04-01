@@ -148,7 +148,9 @@ export function LoginForm({ providers }: LoginFormProps) {
             ) : (
               <KeyRound className="mr-2 size-4" />
             )}
-            {loading === 'keycloak' ? 'Redirecting...' : 'Sign in with Keycloak'}
+            {loading === 'keycloak'
+              ? 'Redirecting...'
+              : 'Sign in with Keycloak'}
           </Button>
         )}
       </CardContent>

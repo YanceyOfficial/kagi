@@ -23,9 +23,7 @@ test.describe('Login page', () => {
   })
 
   test('renders sign-in description', async ({ page }) => {
-    await expect(
-      page.getByText('Sign in to manage your secrets')
-    ).toBeVisible()
+    await expect(page.getByText('Sign in to manage your secrets')).toBeVisible()
   })
 
   test('renders the Sign in with Keycloak button (enabled by default)', async ({

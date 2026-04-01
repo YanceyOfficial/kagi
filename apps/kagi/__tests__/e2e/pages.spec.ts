@@ -211,9 +211,7 @@ test.describe('App sidebar navigation', () => {
   })
 
   test('sidebar contains Env Manager link', async ({ page }) => {
-    await expect(
-      page.getByRole('link', { name: /env manager/i })
-    ).toBeVisible()
+    await expect(page.getByRole('link', { name: /env manager/i })).toBeVisible()
   })
 
   test('sidebar contains Settings link', async ({ page }) => {

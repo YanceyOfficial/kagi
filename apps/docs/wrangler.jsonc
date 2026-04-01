@@ -6,10 +6,7 @@
     "enabled": true
   },
   "main": "dist/_worker.js/index.js",
-  "compatibility_flags": [
-    "global_fetch_strictly_public",
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["global_fetch_strictly_public", "nodejs_compat"],
   "assets": {
     "binding": "ASSETS",
     "directory": "dist"

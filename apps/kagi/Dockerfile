@@ -2,7 +2,7 @@
 #   docker build -f apps/kagi/Dockerfile -t kagi .
 
 # ─── Stage 1: Dependencies ───────────────────────────────────────────────────
-FROM node:22-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -10,13 +10,12 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Copy workspace manifests first for layer caching
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/kagi/package.json ./apps/kagi/
-COPY packages/eslint-config/package.json ./packages/eslint-config/
 COPY packages/tsconfig/package.json ./packages/tsconfig/
 
 RUN pnpm install --frozen-lockfile
 
 # ─── Stage 2: Builder ────────────────────────────────────────────────────────
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
@@ -29,7 +28,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN cd apps/kagi && pnpm build
 
 # ─── Stage 3: Runner ─────────────────────────────────────────────────────────
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

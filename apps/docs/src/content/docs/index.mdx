@@ -14,7 +14,7 @@ hero:
       icon: open-book
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components'
 
 ## What is Kagi?
 
@@ -22,15 +22,18 @@ Kagi is a self-hosted secret management system. It lets you store encrypted API 
 
 <CardGrid>
   <Card title="AES-256-GCM encryption" icon="seti:lock">
-    All secret values are encrypted at rest. Values are never returned by list or detail endpoints — only via explicit `/reveal` calls.
+    All secret values are encrypted at rest. Values are never returned by list
+    or detail endpoints — only via explicit `/reveal` calls.
   </Card>
   <Card title="Scoped access keys" icon="seti:config">
-    Create API keys with fine-grained scopes. Grant only `entries:read` for read-only automation, add `entries:reveal` for scripts that need values.
+    Create API keys with fine-grained scopes. Grant only `entries:read` for
+    read-only automation, add `entries:reveal` for scripts that need values.
   </Card>
   <Card title="Structured key types" icon="seti:db">
     Two key types: `simple` (single env var) and `group` (multi-field map).
   </Card>
   <Card title="AI extraction" icon="seti:html">
-    Describe your project in natural language and get a ready-to-paste `.env` file. The AI sees only key names — never values.
+    Describe your project in natural language and get a ready-to-paste `.env`
+    file. The AI sees only key names — never values.
   </Card>
 </CardGrid>

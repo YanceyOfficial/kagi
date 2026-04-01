@@ -91,7 +91,10 @@ describe('withAuth', () => {
     })
     const { body, status } = unwrap(res)
     expect(status).toBe(500)
-    expect(body).toEqual({ error: 'DB connection failed', code: 'INTERNAL_ERROR' })
+    expect(body).toEqual({
+      error: 'DB connection failed',
+      code: 'INTERNAL_ERROR'
+    })
   })
 
   it('returns 500 with fallback message when handler throws a non-Error', async () => {
@@ -100,6 +103,9 @@ describe('withAuth', () => {
     })
     const { body, status } = unwrap(res)
     expect(status).toBe(500)
-    expect(body).toEqual({ error: 'Internal server error', code: 'INTERNAL_ERROR' })
+    expect(body).toEqual({
+      error: 'Internal server error',
+      code: 'INTERNAL_ERROR'
+    })
   })
 })

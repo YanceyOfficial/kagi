@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -78,7 +78,7 @@
   --muted: oklch(0.92 0.008 150);
   --muted-foreground: oklch(0.52 0.03 150);
 
-  --accent: oklch(0.90 0.02 150);
+  --accent: oklch(0.9 0.02 150);
   --accent-foreground: oklch(0.24 0.04 150);
 
   --destructive: oklch(0.58 0.23 27);
@@ -97,7 +97,7 @@
   --sidebar-foreground: oklch(0.18 0.02 150);
   --sidebar-primary: oklch(0.48 0.16 150);
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.90 0.02 150);
+  --sidebar-accent: oklch(0.9 0.02 150);
   --sidebar-accent-foreground: oklch(0.24 0.04 150);
   --sidebar-border: oklch(0.82 0.015 150);
   --sidebar-ring: oklch(0.48 0.16 150);
@@ -112,7 +112,7 @@
   --card-foreground: oklch(0.88 0.04 145);
 
   --popover: oklch(0.095 0.01 145);
-  --popover-foreground: oklch(0.90 0.045 145);
+  --popover-foreground: oklch(0.9 0.045 145);
 
   /* Primary: phosphor green — interaction only */
   --primary: oklch(0.75 0.24 142);
@@ -147,7 +147,7 @@
   --sidebar-primary: oklch(0.75 0.24 142);
   --sidebar-primary-foreground: oklch(0.06 0.01 145);
   --sidebar-accent: oklch(0.16 0.018 145);
-  --sidebar-accent-foreground: oklch(0.80 0.05 145);
+  --sidebar-accent-foreground: oklch(0.8 0.05 145);
   --sidebar-border: oklch(0.25 0.02 145);
   --sidebar-ring: oklch(0.75 0.24 142);
 }
@@ -164,8 +164,8 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+      'rlig' 1,
+      'calt' 1;
   }
 
   /* Monospace for secrets / keys */
@@ -176,11 +176,13 @@
   /* Terminal scanline background */
   .terminal-bg {
     background-color: oklch(0.06 0.008 145);
-    background-image: repeating-linear-gradient(0deg,
-        transparent,
-        transparent 2px,
-        oklch(0.75 0.24 142 / 0.035) 2px,
-        oklch(0.75 0.24 142 / 0.035) 4px);
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      oklch(0.75 0.24 142 / 0.035) 2px,
+      oklch(0.75 0.24 142 / 0.035) 4px
+    );
   }
 
   /* Subtle green glow */
@@ -190,13 +192,12 @@
 
   /* Blinking cursor */
   .cursor-blink::after {
-    content: "_";
+    content: '_';
     animation: blink 1.2s step-end infinite;
     @apply text-primary;
   }
 
   @keyframes blink {
-
     0%,
     100% {
       opacity: 1;

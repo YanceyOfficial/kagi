@@ -27,7 +27,8 @@ function generateSecret(bytes: number, format: SecretFormat): string {
     case 'alphanumeric': {
       const result: string[] = []
       for (const byte of buf) {
-        if (byte < 248) result.push(ALPHANUM_CHARS[byte % ALPHANUM_CHARS.length])
+        if (byte < 248)
+          result.push(ALPHANUM_CHARS[byte % ALPHANUM_CHARS.length])
         if (result.length === bytes) break
       }
       while (result.length < bytes) {

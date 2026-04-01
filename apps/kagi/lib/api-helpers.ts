@@ -97,7 +97,8 @@ export async function requireSession(requiredScope?: AccessKeyScope) {
     .where(eq(userTable.id, userId))
     .limit(1)
 
-  if (!userRow) throw new AuthError('User not found', 401, ErrorCode.AUTH_REQUIRED)
+  if (!userRow)
+    throw new AuthError('User not found', 401, ErrorCode.AUTH_REQUIRED)
 
   return { user: userRow }
 }
