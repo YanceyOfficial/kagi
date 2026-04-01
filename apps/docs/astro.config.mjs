@@ -43,6 +43,7 @@ export default defineConfig({
               label: 'Two-Factor Tokens',
               slug: 'api-reference/two-factor-tokens'
             },
+            { label: 'Env Projects', slug: 'api-reference/env-projects' },
             { label: 'Stats & Export', slug: 'api-reference/stats-and-export' },
             { label: 'AI Extraction', slug: 'api-reference/ai-extraction' },
             { label: 'Access Keys', slug: 'api-reference/access-keys' }

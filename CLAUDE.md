@@ -20,8 +20,8 @@ Run from the **repo root** (Turborepo orchestrates all apps):
 ```bash
 pnpm dev          # Start all dev servers in parallel (Turbopack for kagi)
 pnpm build        # Production build for all apps
-pnpm lint         # ESLint + astro check across all apps
-pnpm format       # Prettier format (ts, tsx, md)
+pnpm lint         # oxlint + astro check across all apps
+pnpm format       # oxfmt format
 ```
 
 Run scoped to one app when you only need it:
@@ -55,14 +55,16 @@ Unit tests: `apps/kagi/__tests__/unit/`. E2E tests: `apps/kagi/__tests__/e2e/`.
 
 ### DB Schema (`lib/db/schema.ts`)
 
-Five application tables on top of the four better-auth tables (`user`, `session`, `account`, `verification`):
+Seven application tables on top of the four better-auth tables (`user`, `session`, `account`, `verification`):
 
-| Table               | Description                                                     |
-| ------------------- | --------------------------------------------------------------- |
-| `key_categories`    | Key type definitions (name, keyType, envVarName, icon, color)   |
-| `key_entries`       | Per-project instances of a category; holds `encryptedValue`     |
-| `two_factor_tokens` | Encrypted 2FA recovery token arrays per service                 |
-| `access_keys`       | Programmatic API keys (SHA-256 hashed, scoped, optional expiry) |
+| Table               | Description                                                              |
+| ------------------- | ------------------------------------------------------------------------ |
+| `key_categories`    | Key type definitions (name, keyType, envVarName, iconUrl, iconSlug, color) |
+| `key_entries`       | Per-project instances of a category; holds `encryptedValue`              |
+| `two_factor_tokens` | Encrypted 2FA recovery token arrays per service                          |
+| `access_keys`       | Programmatic API keys (SHA-256 hashed, scoped, optional expiry)          |
+| `env_projects`      | Env file projects (name, description)                                    |
+| `env_files`         | Encrypted .env file content per project (fileType, encryptedContent)     |
 
 **Do not remove the better-auth tables** (`user`, `session`, `account`, `verification`) — drizzle-kit needs them to manage migrations.
 
@@ -71,8 +73,9 @@ Five application tables on top of the four better-auth tables (`user`, `session`
 1. **Key Category** (`key_categories`) — defines the _type_ and _format_ of a key (e.g. "OpenAI API"). Belongs to a `userId`.
 2. **Key Entry** (`key_entries`) — a per-project instance of a category (e.g. "OpenAI for Blog project"). Stores the encrypted value.
 
-`KeyType` enum: `simple` (single env var) | `group` (multi-field JSON map) | `ssh` (file content) | `json` (credential file).
+`KeyType` enum: `simple` (single env var) | `group` (multi-field JSON map).
 `Environment` enum: `production` | `staging` | `development` | `local`.
+`EnvFileType` enum: `env` | `env.local` | `env.production` | `env.development`.
 
 ### Encryption (`lib/encryption.ts`)
 
@@ -80,7 +83,7 @@ AES-256-GCM. Ciphertext format: `iv:authTag:ciphertext` (all base64, colon-separ
 
 - `simple` → encrypt plaintext string
 - `group` → `encryptJson({ [field]: value })`
-- `ssh` / `json` → encrypt raw file content string
+- env files → encrypt raw file content string
 
 Values are **never** returned in list/detail API responses — only via explicit `/reveal` calls.
 
@@ -109,7 +112,7 @@ export async function GET() {
 - Format: `kagi_<43-char-base64url>` (randomBytes(32))
 - Stored as SHA-256 hex hash only — plaintext never persisted
 - `keyPrefix` (e.g. `kagi_ab12cd34`) shown in UI for identification
-- 11 scopes: `categories:read/write`, `entries:read/write/reveal`, `2fa:read/write/reveal`, `stats:read`, `export:read`, `ai:extract`
+- 14 scopes: `categories:read/write`, `entries:read/write/reveal`, `2fa:read/write/reveal`, `envs:read/write/reveal`, `stats:read`, `export:read`, `ai:extract`
 - `POST /api/access-keys` returns `{ ...fields, key }` once — key not retrievable after that
 
 ### API Routes (`app/api/`)
@@ -127,7 +130,14 @@ export async function GET() {
 | `POST /api/2fa/[id]/reveal`           | `2fa:reveal`                           |
 | `GET /api/stats`                      | `stats:read`                           |
 | `GET /api/export`                     | `export:read`                          |
+| `GET /api/entries/project-names`       | `entries:read`                         |
+| `GET/POST /api/envs`                  | `envs:read` / `envs:write`            |
+| `GET/PUT/DELETE /api/envs/[id]`       | `envs:read` / `envs:write`            |
+| `GET/POST /api/envs/[id]/files`       | `envs:read` / `envs:write`            |
+| `DELETE /api/envs/[id]/files/[fileId]`| `envs:write`                           |
+| `POST /api/envs/[id]/files/[fileId]/reveal` | `envs:reveal`                    |
 | `POST /api/ai/extract`                | `ai:extract`                           |
+| `DELETE /api/account/data`            | Session auth only                      |
 | `GET/POST /api/access-keys`           | Any valid auth (no scope required)     |
 | `DELETE /api/access-keys/[id]`        | Any valid auth (no scope required)     |
 
@@ -141,13 +151,14 @@ Ownership is always enforced: joins or `where` clauses include `userId = session
 
 All client-side HTTP goes through React Query hooks in `lib/hooks/`:
 
-| Hook file            | Hooks                                                                                            |
-| -------------------- | ------------------------------------------------------------------------------------------------ |
-| `use-categories.ts`  | `useCategories`, `useCategory`, `useCreateCategory`, `useUpdateCategory`, `useDeleteCategory`    |
-| `use-entries.ts`     | `useEntries`, `useEntry`, `useRevealEntry`, `useCreateEntry`, `useUpdateEntry`, `useDeleteEntry` |
-| `use-2fa.ts`         | `use2faTokens`, `useReveal2fa`, `useCreate2fa`, `useUpdate2fa`, `useDelete2fa`                   |
-| `use-stats.ts`       | `useStats`                                                                                       |
-| `use-access-keys.ts` | `useAccessKeys`, `useCreateAccessKey`, `useRevokeAccessKey`                                      |
+| Hook file            | Hooks                                                                                                                         |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `use-categories.ts`  | `useCategories`, `useCreateCategory`, `useUpdateCategory`, `useDeleteCategory`                                                |
+| `use-entries.ts`     | `useEntries`, `useProjectNames`, `useRevealEntry`, `useCreateEntry`, `useUpdateEntry`, `useDeleteEntry`                       |
+| `use-2fa.ts`         | `useTwoFactorTokens`, `useRevealTwoFactor`, `useCreateTwoFactor`, `useDeleteTwoFactor`                                       |
+| `use-envs.ts`        | `useEnvProjects`, `useEnvProject`, `useCreateEnvProject`, `useUpdateEnvProject`, `useDeleteEnvProject`, `useSaveEnvFile`, `useRevealEnvFile`, `useDeleteEnvFile` |
+| `use-stats.ts`       | `useStats`                                                                                                                    |
+| `use-access-keys.ts` | `useAccessKeys`, `useCreateAccessKey`, `useRevokeAccessKey`                                                                   |
 
 No direct `fetch` calls in components.
 
@@ -182,7 +193,7 @@ Privacy-preserving: AI receives only key names + project names (never values). U
 ## Key Gotchas
 
 - **Zod v4**: Use `z.record(keySchema, valueSchema)` (both args required). Validation errors are on `.issues`, not `.errors`.
-- **React Compiler (ESLint)**: `Date.now()` and `Math.random()` inside render functions trigger purity warnings. Move them to `const` variables before the JSX return.
+- **React Compiler**: `Date.now()` and `Math.random()` inside render functions trigger purity warnings. Move them to `const` variables before the JSX return.
 - **`withAuth` uses `any`**: `Promise<NextResponse<any>>` intentionally — union return types can't be inferred through the wrapper.
 - **DB schema includes better-auth tables**: `user`, `session`, `account`, `verification` in `lib/db/schema.ts`. Don't remove them.
 - **Tailwind v4 + oklch**: Theme uses `oklch()` color functions, not hex. Dark mode forced globally (`html { @apply dark }`). Matrix green primary: `oklch(0.65 0.2 150)`.

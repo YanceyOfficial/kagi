@@ -11,7 +11,7 @@ This guide walks you through self-hosting Kagi and making your first API call.
 
 ## 1. Choose an auth method
 
-Kagi supports two login methods — pick one.
+Kagi supports two login methods — pick one or both.
 
 ### Option A — Email / password
 
@@ -19,11 +19,7 @@ The simplest option, no external dependencies required.
 
 ```bash
 ENABLE_EMAIL_PASSWORD=true
-ADMIN_EMAIL=you@example.com
-ADMIN_PASSWORD=<your-password>
 ```
-
-On first startup, Kagi automatically creates the admin account from these values.
 
 ### Option B — Keycloak (SSO)
 
@@ -58,62 +54,36 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Auth — pick one or both from step 1
 ENABLE_EMAIL_PASSWORD=true
-ADMIN_EMAIL=you@example.com
-ADMIN_PASSWORD=<your-password>
+
+# Keycloak (optional — see step 1)
+# KEYCLOAK_URL=https://sso.example.com
+# KEYCLOAK_REALM=kagi
+# KEYCLOAK_CLIENT_ID=kagi
+# KEYCLOAK_CLIENT_SECRET=<client-secret>
 
 # OpenAI (optional — for AI extraction feature)
-OPENAI_API_KEY=sk-...
+# OPENAI_API_KEY=sk-...
 ```
 
 ## 3. Start with Docker Compose
-
-### Option A — Prebuilt image (recommended)
-
-```bash
-docker compose up -d
-```
-
-The `docker-compose.yml` uses `yanceyofficial/kagi:latest` by default — no build step needed.
-
-### Option B — Build from source
-
-Clone the repo, edit `docker-compose.yml` to swap the image for a local build:
-
-```bash
-git clone https://github.com/YanceyOfficial/kagi.git
-cd kagi/apps/kagi
-```
-
-In `docker-compose.yml`, comment out `image:` and uncomment the `build:` block:
-
-```yaml
-app:
-  # image: yanceyofficial/kagi:latest   # ← comment this out
-  build:
-    context: .
-    dockerfile: Dockerfile
-```
-
-Then start:
-
-```bash
-docker compose up -d --build
-```
-
-## 4. Database migrations
-
-Migrations run automatically via the `migrate` service in `docker-compose.yml` before the app starts. You don't need to do anything manually.
-
-When you pull a new image, the same flow applies — just restart:
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-Docker Compose will re-run the `migrate` service, apply any new migrations, then start the app.
+The prebuilt image `yanceyofficial/kagi:latest` is pulled from Docker Hub — no build step needed. Database migrations run automatically on startup before the app begins serving requests.
 
 The app is now running at [http://localhost:3000](http://localhost:3000).
+
+## 4. Upgrading
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+New migrations are applied automatically on every startup.
 
 ## 5. Log in and create an access key
 

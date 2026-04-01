@@ -3,7 +3,7 @@ title: Introduction
 description: What is Kagi and how does it work?
 ---
 
-Kagi is a **self-hosted encrypted secret management system** for developers. Think of it as a private vault for your API keys, SSH keys, environment configs, and 2FA recovery tokens.
+Kagi is a **self-hosted encrypted secret management system** for developers. Think of it as a private vault for your API keys, environment configs, `.env` files, and 2FA recovery tokens.
 
 ## Core concepts
 

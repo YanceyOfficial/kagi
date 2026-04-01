@@ -33,7 +33,7 @@ Access keys carry [scopes](/authentication/scopes/) that control which endpoints
 
 ### Browser session
 
-The web UI uses cookie-based sessions via Keycloak OIDC. Session-authenticated requests have full access and bypass scope checks.
+The web UI uses cookie-based sessions (Keycloak OIDC or email/password). Session-authenticated requests have full access and bypass scope checks.
 
 ## OpenAPI spec
 

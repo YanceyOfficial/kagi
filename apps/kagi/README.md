@@ -8,14 +8,15 @@ Kagi (Japanese: 鍵, _key_) is a secure vault for all your private keys, API cre
 
 ## Features
 
-- **Multiple key formats** — simple strings (`OPENAI_API_KEY`), grouped fields (AWS S3), SSH key files, JSON credential files, and 2FA recovery tokens
+- **Multiple key formats** — simple strings (`OPENAI_API_KEY`), grouped fields (AWS S3), and 2FA recovery tokens
 - **Two-level organization** — key categories (service type) → entries (per-project instances)
+- **Env file manager** — store and reveal `.env`, `.env.local`, `.env.production`, `.env.development` files per project
 - **Encryption at rest** — AES-256-GCM with a master key you control; values are never stored in plaintext
 - **AI-powered extraction** — describe what you need in plain English; the AI selects the right keys and generates a ready-to-use `.env` file. The AI never sees actual secret values
-- **Keycloak SSO** — authentication is delegated entirely to your existing Keycloak instance
+- **Flexible auth** — Keycloak SSO or email/password authentication
 - **Dashboard analytics** — key type distribution, environment breakdown, expiry tracking
-- **Search** — filter across all categories and entries
-- **File upload** — drag-and-drop SSH keys and JSON credential files; download them back on demand
+- **Search** — filter across all categories, entries, and env projects
+- **Scoped API access** — programmatic access keys with fine-grained permission scopes
 
 ---
 
@@ -156,28 +157,32 @@ All variables from `.env.example` should be present in the `.env` file used by D
 ```
 kagi/
 ├── app/
-│   ├── (auth)/login/          # Keycloak login page
+│   ├── (auth)/login/          # Login page
 │   ├── (dashboard)/           # Auth-guarded dashboard
 │   │   ├── page.tsx           # Overview / analytics
 │   │   ├── keys/              # Key categories + entries
 │   │   ├── 2fa/               # 2FA recovery tokens
-│   │   └── ai-extract/        # AI .env generator
+│   │   ├── envs/              # Env file manager
+│   │   └── settings/          # API keys, export, account
 │   └── api/                   # REST API route handlers
 │       ├── auth/[...all]/     # better-auth handler
 │       ├── categories/        # Key category CRUD
 │       ├── entries/           # Key entry CRUD + reveal
 │       ├── 2fa/               # 2FA token CRUD + reveal
-│       ├── upload/            # File upload (SSH / JSON)
+│       ├── envs/              # Env project + file CRUD + reveal
 │       ├── stats/             # Dashboard statistics
-│       └── ai/extract/        # AI extraction endpoint
+│       ├── export/            # Vault export
+│       ├── ai/extract/        # AI extraction endpoint
+│       ├── access-keys/       # API key management
+│       └── account/           # Account data management
 ├── components/
-│   ├── ai/                    # AI extractor + Monaco env preview
 │   ├── auth/                  # Login form
 │   ├── 2fa/                   # 2FA cards + dialogs
 │   ├── dashboard/             # Stats, charts
 │   ├── dialogs/               # Create/edit/delete dialogs
+│   ├── envs/                  # Env project + file editor
 │   ├── keys/                  # Category + entry cards
-│   ├── layout/                # Sidebar + site header
+│   ├── settings/              # Settings page
 │   ├── providers/             # React Query + Toaster
 │   └── ui/                    # shadcn/ui components
 ├── lib/
@@ -186,8 +191,7 @@ kagi/
 │   ├── hooks/                 # React Query hooks
 │   ├── api-helpers.ts         # withAuth(), requireSession()
 │   └── encryption.ts          # AES-256-GCM utilities
-├── types/
-│   └── index.ts               # Shared TypeScript types
+├── types/                     # Shared TypeScript types
 ├── Dockerfile
 ├── docker-compose.yml
 └── .env.example
@@ -209,8 +213,8 @@ kagi/
 ```bash
 pnpm dev          # Start development server
 pnpm build        # Production build
-pnpm lint         # ESLint check
-pnpm format       # Prettier format
+pnpm lint         # Lint (oxlint + astro check)
+pnpm format       # Format (oxfmt)
 pnpm db:push      # Push schema changes to DB (no migration files)
 pnpm db:generate  # Generate migration files
 pnpm db:migrate   # Run pending migrations
