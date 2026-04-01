@@ -40,7 +40,7 @@ Set the Keycloak client's redirect URI to `https://your-kagi-url/api/auth/callba
 
 ## 2. Configure environment variables
 
-Create an `.env` file in the same directory as `docker-compose.yml`:
+Download [`docker-compose.yml`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/docker-compose.yml) and create an `.env` file in the same directory (see [`.env.example`](https://github.com/YanceyOfficial/kagi/blob/master/apps/kagi/.env.example) for all available options):
 
 ```bash
 # Database — auto-managed by Docker Compose
