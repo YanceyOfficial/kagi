@@ -18,20 +18,24 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useRevealEntry } from '@/lib/hooks/use-entries'
 import { cn } from '@/lib/utils'
-import type { KeyEntryWithCategory, RevealedKeyValue } from '@/types'
+import type { KeyEntryWithCategory } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import {
   Copy,
   Download,
-  Eye,
-  EyeOff,
   Loader2,
   MoreHorizontal,
   Pencil,
   Trash2
 } from 'lucide-react'
-import { useState } from 'react'
 import { sileo } from 'sileo'
+
+function formatEntryValue(value: string | Record<string, string>): string {
+  if (typeof value === 'string') return value
+  return Object.entries(value)
+    .map(([k, v]) => `${k}="${v}"`)
+    .join('\n')
+}
 
 const ENV_COLORS: Record<string, string> = {
   production: 'border-emerald-700/50 bg-emerald-950/30 text-emerald-400',
@@ -47,46 +51,21 @@ interface EntryCardProps {
 }
 
 export function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
-  const [revealed, setRevealed] = useState<RevealedKeyValue | null>(null)
   const revealMutation = useRevealEntry()
 
-  async function handleReveal() {
-    if (revealed) {
-      setRevealed(null)
-      return
-    }
+  async function handleCopy() {
     const data = await revealMutation.mutateAsync(entry.id)
-    setRevealed(data)
-  }
-
-  function handleCopy() {
-    if (!revealed) return
-    let text: string
-    if (typeof revealed.value === 'string') {
-      text = revealed.value
-    } else {
-      text = Object.entries(revealed.value)
-        .map(([k, v]) => `${k}="${v}"`)
-        .join('\n')
-    }
-    navigator.clipboard.writeText(text)
+    navigator.clipboard.writeText(formatEntryValue(data.value))
     sileo.success({ title: 'Copied to clipboard' })
   }
 
-  function handleDownload() {
-    if (!revealed) return
-    let content: string
-    let filename: string
-
-    if (typeof revealed.value === 'string') {
-      content = revealed.value
-      filename = entry.projectName
-    } else {
-      content = Object.entries(revealed.value)
-        .map(([k, v]) => `${k}="${v}"`)
-        .join('\n')
-      filename = `${entry.projectName}.env`
-    }
+  async function handleDownload() {
+    const data = await revealMutation.mutateAsync(entry.id)
+    const content = formatEntryValue(data.value)
+    const filename =
+      typeof data.value === 'string'
+        ? entry.projectName
+        : `${entry.projectName}.env`
 
     const blob = new Blob([content], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -143,16 +122,14 @@ export function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
               variant="ghost"
               size="icon"
               className="size-7"
-              onClick={handleReveal}
+              onClick={handleCopy}
               disabled={revealMutation.isPending}
-              title={revealed ? 'Hide key' : 'Reveal key'}
+              title="Copy value"
             >
               {revealMutation.isPending ? (
                 <Loader2 className="size-3.5 animate-spin" />
-              ) : revealed ? (
-                <EyeOff className="size-3.5" />
               ) : (
-                <Eye className="size-3.5" />
+                <Copy className="size-3.5" />
               )}
             </Button>
             <DropdownMenu>
@@ -162,19 +139,11 @@ export function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="font-mono">
-                {revealed && (
-                  <>
-                    <DropdownMenuItem onClick={handleCopy}>
-                      <Copy className="mr-2 size-3.5" />
-                      Copy value
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleDownload}>
-                      <Download className="mr-2 size-3.5" />
-                      Download
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
+                <DropdownMenuItem onClick={handleDownload}>
+                  <Download className="mr-2 size-3.5" />
+                  Download
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => onEdit(entry)}>
                   <Pencil className="mr-2 size-3.5" />
                   Edit
@@ -204,43 +173,15 @@ export function EntryCard({ entry, onEdit, onDelete }: EntryCardProps) {
           >
             {entry.environment}
           </Badge>
-          <span className="text-muted-foreground ml-auto font-mono text-xs">
-            {formatDistanceToNow(new Date(entry.createdAt), {
+          <span
+            className="text-muted-foreground ml-auto font-mono text-xs"
+            title={`Updated ${new Date(entry.updatedAt).toLocaleString()}`}
+          >
+            {formatDistanceToNow(new Date(entry.updatedAt), {
               addSuffix: true
             })}
           </span>
         </div>
-
-        {/* Revealed value display */}
-        {revealed && (
-          <div className="border-border bg-background/50 terminal-bg mt-2 rounded-md border p-3">
-            {typeof revealed.value === 'string' ? (
-              <div className="space-y-1">
-                {revealed.envVarName && (
-                  <p className="text-muted-foreground font-mono text-xs">
-                    {revealed.envVarName}=
-                  </p>
-                )}
-                <p className="text-primary font-mono text-xs break-all select-all">
-                  {revealed.value}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {Object.entries(revealed.value).map(([key, val]) => (
-                  <div key={key} className="flex gap-2">
-                    <span className="text-muted-foreground shrink-0 font-mono text-xs">
-                      {key}=
-                    </span>
-                    <span className="text-primary font-mono text-xs break-all select-all">
-                      {val}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
         {entry.notes && (
           <p className="text-muted-foreground border-border mt-2 border-t pt-2 font-mono text-xs">

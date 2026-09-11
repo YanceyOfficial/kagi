@@ -176,6 +176,20 @@ const ENVIRONMENTS: Environment[] = [
   'local'
 ]
 
+const EXPIRY_SHORTCUTS: { label: string; days: number }[] = [
+  { label: '1d', days: 1 },
+  { label: '7d', days: 7 },
+  { label: '30d', days: 30 },
+  { label: '90d', days: 90 },
+  { label: '1y', days: 365 }
+]
+
+function daysFromToday(days: number): string {
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return date.toISOString().split('T')[0]
+}
+
 interface CreateEntryDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -434,6 +448,36 @@ export function CreateEntryDialog({
                     onChange={(e) => field.handleChange(e.target.value)}
                     className="font-mono text-sm"
                   />
+                  <div className="flex flex-wrap gap-1 pt-0.5">
+                    {EXPIRY_SHORTCUTS.map((shortcut) => {
+                      const targetDate = daysFromToday(shortcut.days)
+                      const isActive = field.state.value === targetDate
+                      return (
+                        <button
+                          key={shortcut.label}
+                          type="button"
+                          onClick={() => field.handleChange(targetDate)}
+                          className={cn(
+                            'rounded border px-1.5 py-0.5 font-mono text-[10px] transition-colors',
+                            isActive
+                              ? 'border-primary/50 text-primary'
+                              : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'
+                          )}
+                        >
+                          {shortcut.label}
+                        </button>
+                      )
+                    })}
+                    {field.state.value && (
+                      <button
+                        type="button"
+                        onClick={() => field.handleChange('')}
+                        className="text-muted-foreground hover:text-destructive rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </form.Field>
