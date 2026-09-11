@@ -5,5 +5,5 @@ packages:
 onlyBuiltDependencies:
   - esbuild
   - msw
-  - sharp
   - workerd
+  - sharp

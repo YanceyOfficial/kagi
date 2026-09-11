@@ -45,8 +45,8 @@ export function LoginForm({ providers }: LoginFormProps) {
   async function handleKeycloakLogin() {
     setLoading('keycloak')
     try {
-      await signIn.oauth2(
-        { providerId: 'keycloak' },
+      await signIn.social(
+        { provider: 'keycloak', callbackURL: '/' },
         {
           onError: (ctx) => {
             sileo.error({ title: ctx.error.message ?? 'Authentication failed' })

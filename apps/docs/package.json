@@ -6,21 +6,19 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
-    "preview": "npm run build && wrangler dev",
+    "preview": "npm run build",
     "astro": "astro",
     "check-types": "astro check",
     "lint": "astro check",
-    "deploy": "npm run build && wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "deploy": "npm run build"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/cloudflare": "12",
-    "@astrojs/starlight": "^0.37.6",
-    "astro": "^5.6.1"
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/starlight": "^0.42.0",
+    "astro": "^7.3.2"
   },
   "devDependencies": {
-    "wrangler": "^4.78.0",
-    "sharp": "^0.34.2"
+    "sharp": "^0.35.4",
+    "typescript": "^6.0.3"
   }
 }
