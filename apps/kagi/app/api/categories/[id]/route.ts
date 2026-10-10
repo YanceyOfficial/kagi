@@ -54,6 +54,40 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     const data = parsed.data
 
+    if (data.keyType !== undefined || data.fieldDefinitions !== undefined) {
+      const [existing] = await db
+        .select({
+          keyType: keyCategories.keyType,
+          fieldDefinitions: keyCategories.fieldDefinitions
+        })
+        .from(keyCategories)
+        .where(
+          and(
+            eq(keyCategories.id, id),
+            eq(keyCategories.userId, session.user.id)
+          )
+        )
+
+      if (!existing)
+        return apiError('Category not found', 404, ErrorCode.CATEGORY_NOT_FOUND)
+
+      const keyType = data.keyType ?? existing.keyType
+      const fieldDefinitions =
+        data.fieldDefinitions !== undefined
+          ? data.fieldDefinitions
+          : existing.fieldDefinitions
+      if (
+        keyType === 'group' &&
+        (!fieldDefinitions || fieldDefinitions.length === 0)
+      ) {
+        return apiError(
+          'fieldDefinitions are required for group key type',
+          400,
+          ErrorCode.CATEGORY_GROUP_REQUIRES_FIELDS
+        )
+      }
+    }
+
     const [updated] = await db
       .update(keyCategories)
       .set({

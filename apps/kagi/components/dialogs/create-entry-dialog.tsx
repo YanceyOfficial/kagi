@@ -347,6 +347,12 @@ export function CreateEntryDialog({
             <div className="space-y-2">
               <Label className="text-xs">Key Values *</Label>
               <div className="border-border bg-muted/20 space-y-2 rounded border p-3">
+                {!category.fieldDefinitions?.length && (
+                  <p className="text-muted-foreground text-xs">
+                    This category has no fields defined. Edit the category to
+                    add field names first.
+                  </p>
+                )}
                 {(category.fieldDefinitions ?? []).map((field) => (
                   <div
                     key={field}
@@ -495,7 +501,9 @@ export function CreateEntryDialog({
             </Button>
             <Button
               type="submit"
-              disabled={isPending}
+              disabled={
+                isPending || (isGroup && !category.fieldDefinitions?.length)
+              }
               className="font-mono text-sm"
             >
               {isPending && <Loader2 className="mr-2 size-3.5 animate-spin" />}

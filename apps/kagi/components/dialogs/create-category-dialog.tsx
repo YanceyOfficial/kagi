@@ -79,6 +79,7 @@ export function CreateCategoryDialog({
   const existingNames = allCategories.map((c) => c.name)
 
   const [newField, setNewField] = useState('')
+  const [fieldDefsError, setFieldDefsError] = useState<string>()
   // Tracks whether the user has manually typed in envVarName.
   // While false, the field is auto-derived from the service name.
   const userEditedEnvVar = useRef(false)
@@ -94,6 +95,18 @@ export function CreateCategoryDialog({
       fieldDefinitions: editTarget?.fieldDefinitions ?? ([] as string[])
     } satisfies FormValues,
     onSubmit: async ({ value }) => {
+      // Include a field name that was typed but not yet added via Enter / +
+      const pendingField = newField.trim()
+      const fieldDefinitions =
+        pendingField && !value.fieldDefinitions.includes(pendingField)
+          ? [...value.fieldDefinitions, pendingField]
+          : value.fieldDefinitions
+
+      if (value.keyType === 'group' && fieldDefinitions.length === 0) {
+        setFieldDefsError('Add at least one field for a group key')
+        return
+      }
+
       const cleaned: CreateKeyCategoryInput = {
         name: value.name,
         description: value.description || undefined,
@@ -105,9 +118,7 @@ export function CreateCategoryDialog({
             ? value.envVarName || undefined
             : undefined,
         fieldDefinitions:
-          value.keyType === 'group' && value.fieldDefinitions?.length
-            ? value.fieldDefinitions
-            : undefined
+          value.keyType === 'group' ? fieldDefinitions : undefined
       }
 
       if (isEditing && editTarget) {
@@ -135,6 +146,7 @@ export function CreateCategoryDialog({
       fieldDefinitions: editTarget?.fieldDefinitions ?? []
     })
     setNewField('')
+    setFieldDefsError(undefined)
     userEditedEnvVar.current = false
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
@@ -284,6 +296,7 @@ export function CreateCategoryDialog({
                                 if (t && !defs.includes(t)) {
                                   field.handleChange([...defs, t])
                                   setNewField('')
+                                  setFieldDefsError(undefined)
                                 }
                               }
                             }}
@@ -298,6 +311,7 @@ export function CreateCategoryDialog({
                               if (t && !defs.includes(t)) {
                                 field.handleChange([...defs, t])
                                 setNewField('')
+                                setFieldDefsError(undefined)
                               }
                             }}
                           >
@@ -327,6 +341,11 @@ export function CreateCategoryDialog({
                               </span>
                             ))}
                           </div>
+                        )}
+                        {fieldDefsError && (
+                          <p className="text-destructive text-xs">
+                            {fieldDefsError}
+                          </p>
                         )}
                       </div>
                     )
