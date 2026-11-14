@@ -1,0 +1,8 @@
+{
+    "name": "kagi",
+    // Set this to today's date
+    "compatibility_date": "2026-11-14",
+    "assets": {
+        "directory": "./dist"
+    }
+}
